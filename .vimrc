@@ -134,8 +134,10 @@ augroup cprog
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set cinkeys=0{,0},:,0#,!^F,o,O,e
   "au BufWrite,BufNewFile,BufRead,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc
   au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3 
+  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
+  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#252525 gui=bold
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#151010 gui=bold
 augroup END
@@ -326,6 +328,8 @@ set laststatus=2
 set cmdheight=2
 set cinoptions=g0
 set noequalalways
+set splitright
+set splitbelow
 
 map ,cd :call ConditionalCD()<CR><C-L>:<BS>
 map <F5> ,cd
@@ -478,6 +482,8 @@ map ,yes, :s/ /,/ge<NL>:noh<NL>:noh<NL>
 map ,;j :s/  */;/ge<NL>:noh<NL>
 
 
+"remove trailing spaces
+map ,rts :%s/\s\+$//<CR>
 
 map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 
@@ -506,6 +512,8 @@ map ,_nfcomment :normal ,_fcomment<NL>
 map ,_uncomment :let @z = @/<CR>:s/^\(\s*\)<C-R>=escape(comment_string, '/')<CR>/\1/e<NL>:let @/ = @z<CR>:<BS>
 map ,_nuncomment :normal ,_uncomment<NL>
 
+" TODO:  Move this to a company specific file...
+map ,cw <ESC>mzggO// Copyright (c) 2013, <COMPANY NAME>, All Rights Reserved<ESC>`z
 
 " Remove all rational rose comments and extra spaces inserted by rose
 map ,norose :%s@^.*//##.*\n\(\s*\n\)*@@ge<CR>
@@ -667,15 +675,12 @@ endfunction
 
 function! CycleFonts(amount)
    if(has("unix"))
-      " let font_base = "Bitstream Vera Sans Mono"
       let font_base ="Anonymous Pro"
-      let sizes = [ 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36 ]
    else
       let font_base = "Consolas"
-      "let font_base = "Andale_Mono"
-      let sizes = [ 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36 ]
    endif
 
+   let sizes = [ 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36 ]
 
    let g:fontindex = g:fontindex + a:amount
    let g:fontindex = max([g:fontindex, 0])
@@ -1024,6 +1029,7 @@ nnoremap <silent> <F9> :Tlist<CR>
 nnoremap <silent> <S-F9> :TlistSync<CR>
 nnoremap <A-F9> 10<C-W>h
 
+" TODO:  Move to machine specific file
 if has("unix")
   let Tlist_Ctags_Cmd = '/usr/bin/ctags-exuberant'
 else
