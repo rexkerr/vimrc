@@ -438,15 +438,9 @@ map ,big ,tall,wide
 
 
 " Quick commands for editing this file
-if has("unix")
-  map ,svimrc :source $HOME/.vimrc<NL>
-  map ,evimrc :edit $HOME/.vimrc<NL>
-  map ,egvimrc :edit $HOME/.gvimrc<NL>
-else
-  map ,svimrc :source $VIM/.vimrc<NL>
-  map ,evimrc :edit $VIM/.vimrc<NL>
-  map ,egvimrc :edit $VIM/.gvimrc<NL>
-endif
+map ,svimrc  :source $HOME/.vimrc<NL>
+map ,evimrc  :edit   $HOME/.vimrc<NL>
+map ,egvimrc :edit   $HOME/.gvimrc<NL>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
@@ -454,7 +448,7 @@ endif
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " map ,ahk :e C:\Program Files\AutoHotkey\AutoHotkey.ini<CR>:set ft=autohotkey<CR>
-map ,ahk :e c:\Documents and Settings\rkerr\My Documents\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
+map ,ahk :e $HOME\My Documents\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
 
 " Swap the word under the cursor with the current buffer
 map ,sw ciw<C-R>0<ESC>
