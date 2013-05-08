@@ -71,7 +71,6 @@
 " M-F12: Reload (built in)
 
 
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
 "  Clean up old settings in case we're reloading...
@@ -79,6 +78,29 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 mapc                         " remove all previous mappings
 abc                          " remove all previous abbreviations
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+"  Load machine specific settings
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let host_config_file=$HOME."/.vimrc_host.vim"
+if !filereadable(host_config_file)
+   echo "Creating a template machine_specific configuration file in ".$HOME
+
+   let host_config_lines=[]
+   let host_config_lines=host_config_lines+["\"-------- fonts --------"]
+   let host_config_lines=host_config_lines+["let font_base=\"Consolas\""]
+   let host_config_lines=host_config_lines+["let initialfontindex=2"]
+   let host_config_lines=host_config_lines+[""]
+   let host_config_lines=host_config_lines+["\"-------- other --------"]
+   let host_config_lines=host_config_lines+[""]
+      
+   call writefile(host_config_lines, host_config_file)
+endif
+
+exec ":source ".host_config_file
+
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -328,8 +350,6 @@ set laststatus=2
 set cmdheight=2
 set cinoptions=g0
 set noequalalways
-set splitright
-set splitbelow
 
 map ,cd :call ConditionalCD()<CR><C-L>:<BS>
 map <F5> ,cd
@@ -360,7 +380,7 @@ map <S-F5> :cd \<NL>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <F2> :call CycleFonts(1)<CR>
 map <S-F2> :call CycleFonts(-1)<CR>
-map <M-F2> :let fontindex = 0<NL><F2>
+map <M-F2> :let fontindex=g:initialfontindex<CR>:call CycleFonts(0)<CR>
 map <F3> <C-^>
 map <F6> :call LoadHeaderOrSrcFile(0)<CR>
 map <S-F6> :call LoadHeaderOrSrcFile(1)<CR>
@@ -668,46 +688,25 @@ function! GetHeaderOrSrcFile(force_h_cpp)
 endfunction
 
 function! CycleFonts(amount)
-   if(has("unix"))
-      let font_base ="Anonymous Pro"
-   else
-      let font_base = "Consolas"
-   endif
-
    let sizes = [ 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36 ]
 
    let g:fontindex = g:fontindex + a:amount
    let g:fontindex = max([g:fontindex, 0])
    let g:fontindex = min([g:fontindex, len(sizes) - 1])
    if(has("unix"))
-      let f = font_base . " " . sizes[g:fontindex]
+      let f = g:font_base . " " . sizes[g:fontindex]
    else
-      let f = font_base . ":h" . sizes[g:fontindex]
+      let f = g:font_base . ":h" . sizes[g:fontindex]
    endif
    let &guifont = f
 endfunction
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"
-" TODO:  Move the setting of this to a machine specific file
-"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "fontindex is global for use in the CycleFonts() function
 "but we won't reset the font if we've already started
 if !exists("fontindex")
-  if ( hostname() == 'debdesk' )
-    let fontindex=2
-  elseif ( hostname() == 'lus-rkerr' )
-     let fontindex=2
-  elseif ( hostname() == 'ramen' )
-     let fontindex=3
-  else
-    let fontindex=0
-  endif
-
-  call CycleFonts(1)
+  let fontindex=g:initialfontindex
+  call CycleFonts(0)
 endif
-
 
 
 " @r prints a ruler across the screen that looks something like this:
