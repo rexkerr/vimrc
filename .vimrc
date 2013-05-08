@@ -94,12 +94,18 @@ if !filereadable(host_config_file)
    let host_config_lines=host_config_lines+["let initialfontindex=2"]
    let host_config_lines=host_config_lines+[""]
    let host_config_lines=host_config_lines+["\"-------- other --------"]
+   let host_config_lines=host_config_lines+["let defaultprojectconfig=$HOME.\"/.vimprojects/default\""]
    let host_config_lines=host_config_lines+[""]
       
    call writefile(host_config_lines, host_config_file)
 endif
 
 exec ":source ".host_config_file
+
+if filereadable(defaultprojectconfig)
+   exec ":source ".defaultprojectconfig
+endif
+
 
 
 
@@ -1199,5 +1205,25 @@ map <F12> ,unp
 map ,main :set ft=cpp<CR>I#include <iostream><CR><CR>namespace<CR>{<CR>}<CR><CR>int main()<CR>{<CR>}<CR><ESC>2k
 
 " ----------------------------------------------------------------------------- 
+
+fun SelectProjectConfig()
+   let projectfiles=globpath($HOME."/.vimprojects/","*")
+   if(projectfiles=='')
+      call confirm("No project files to load!", "ok", 1)
+   else
+      let selectedproject=confirm("Which project would you like to load?", projectfiles, 1, "Question")
+      
+      if(selectedproject != 0)
+         let projects=split(projectfiles,"\n")
+         exec ":source ".projects[selectedproject - 1]
+      else
+         echo "Fine, be that way... I'll leave the project settings alone!"
+      endif
+   endif
+endfun
+
+map ,proj :call SelectProjectConfig()<CR>
+
+
 
 " vim: nowrap
