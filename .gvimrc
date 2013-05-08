@@ -25,4 +25,8 @@ set go-=T
 " Make the tabline text rather than graphical
 set go-=e
 
+" Remove the help menu since I never use it and its accelerator 
+" interferes w/ alt-h, which I use for navigating splits (see .vimrc)
+aunmenu Help
+
 " vim: nowrap

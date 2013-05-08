@@ -19,21 +19,21 @@
 "    TODO:
 "
 "      - Need to extract machine specific elements so that I have less churn in
-"        my primary file & it stays the same across all of my machines, easing 
+"        my primary file & it stays the same across all of my machines, easing
 "        maintenance
 "
 "      - Extract Windows specific vs. Unix specific references to OS specific
 "        files
 "
 "      - More cleanup
-"      
+"
 "      - More documentation
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Function keys, documentation:
 " F1:  Not used, built in help
-" 
+"
 " F2: Increase font size
 " S-F2: Decrease font size
 " M-F2: Go to default font size
@@ -50,7 +50,7 @@
 " S-F6: I forget, what's different?
 "
 " F7: Not used
-" 
+"
 " F8: Comment out selection, or current line
 " S-F8: Uncomment out selection, or current line
 " M-F8: I forget, what's different here?
@@ -64,7 +64,7 @@
 " F11: Go to next error
 " S-F11: go to previous error
 " M-F11: (??Show status of build??)
-" 
+"
 " Deprecated... reused
 " F12: Save file
 " S-F12: Revert
@@ -96,7 +96,7 @@ if !filereadable(host_config_file)
    let host_config_lines=host_config_lines+["\"-------- other --------"]
    let host_config_lines=host_config_lines+["let defaultprojectconfig=$HOME.\"/.vimprojects/default\""]
    let host_config_lines=host_config_lines+[""]
-      
+
    call writefile(host_config_lines, host_config_file)
 endif
 
@@ -111,7 +111,7 @@ endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 filetype on                  " enable filetype detection
-filetype plugin on           " 
+filetype plugin on           "
 filetype indent on           "
 
 set nocompatible             " Leave vi in the past
@@ -139,9 +139,9 @@ set background=dark          " I almost always use a black background...
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 
-" TODO:  This whole augroup block is really old... there are better 
-"        ways to do this now with filetype plugins... need to research 
+"
+" TODO:  This whole augroup block is really old... there are better
+"        ways to do this now with filetype plugins... need to research
 "        and refactor.
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -161,7 +161,7 @@ augroup cprog
   au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let comment_string = "//"
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set cinkeys=0{,0},:,0#,!^F,o,O,e
   "au BufWrite,BufNewFile,BufRead,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc
-  au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3 
+  au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
@@ -253,23 +253,23 @@ augroup LogFiles
 augroup END
 
 " Turn off syntax highlighting, etc. for large files
-let g:LargeFile= 10     " in megabytes 
-let g:LargeFile= g:LargeFile*1024*1024 
-augroup LargeFile 
-   au BufReadPre * 
-   \ let f=expand("<afile>") | 
-   \  if getfsize(f) >= g:LargeFile | 
-   \  let b:eikeep= &ei | 
-   \  let b:ulkeep= &ul | 
-   \  set ei=FileType | 
-   \  setlocal noswf bh=unload | 
-   \  let f=escape(substitute(f,'\','/','g'),' ') | 
-"   \  exe "au LargeFile BufEnter ".f." set ul=-1" | 
-   \  exe "au LargeFile BufEnter ".f." set ul=2" | 
-   \  exe "au LargeFile BufLeave ".f." let &ul=".b:ulkeep."|set ei=".b:eikeep | 
-   \  exe "au LargeFile BufUnload ".f." au! LargeFile * ". f | 
-   \  echomsg "***note*** handling a large file" | 
-   \ endif 
+let g:LargeFile= 10     " in megabytes
+let g:LargeFile= g:LargeFile*1024*1024
+augroup LargeFile
+   au BufReadPre *
+   \ let f=expand("<afile>") |
+   \  if getfsize(f) >= g:LargeFile |
+   \  let b:eikeep= &ei |
+   \  let b:ulkeep= &ul |
+   \  set ei=FileType |
+   \  setlocal noswf bh=unload |
+   \  let f=escape(substitute(f,'\','/','g'),' ') |
+"   \  exe "au LargeFile BufEnter ".f." set ul=-1" |
+   \  exe "au LargeFile BufEnter ".f." set ul=2" |
+   \  exe "au LargeFile BufLeave ".f." let &ul=".b:ulkeep."|set ei=".b:eikeep |
+   \  exe "au LargeFile BufUnload ".f." au! LargeFile * ". f |
+   \  echomsg "***note*** handling a large file" |
+   \ endif
 augroup END
 
 map ,py :!python %<CR>
@@ -286,7 +286,7 @@ map ,fo V%:fo<CR>
 vmap ,fo %:fo<CR>
 
 " Set up the statusline (stl)
-set stl=%f%h%m%r\ %{Options()}%=%l,%c%V\ %{line('$')} 
+set stl=%f%h%m%r\ %{Options()}%=%l,%c%V\ %{line('$')}
 fu! Options()
   let opt="ai".PlusOpt(&ai)
   let opt=opt." rap".PlusOpt(&wrap)
@@ -334,7 +334,7 @@ map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
 if has("unix")
 "   set dir=$TEMP
-"   set bdir=$TEMP  
+"   set bdir=$TEMP
 else
   set dir=$TEMP\vimswap
   set bdir=$TEMP\vimswap
@@ -579,7 +579,7 @@ fu! AlignThingy (...) range
   let originaletvalue = &expandtab
   exe 'set et'
   exe a:firstline . "," . a:lastline . "retab"
-  
+
   if (a:0 == 0)
     let alignchar = input("Input align character: ")
   endif
@@ -599,7 +599,7 @@ fu! AlignComments (opencomm, firstln, lastln)
     let newcol = 0
     " find the most indented comment
     while midln <= lastln
-        let midlnStr = getline(midln)  
+        let midlnStr = getline(midln)
         let newcol = match ( midlnStr, opencomm )
         if newcol > maxcol
             let maxcol = newcol
@@ -610,7 +610,7 @@ fu! AlignComments (opencomm, firstln, lastln)
 
     let midln = a:firstln
     while midln <= lastln
-        let midlnStr = getline(midln)  
+        let midlnStr = getline(midln)
         let curcol = match ( midlnStr, opencomm )
         let spaces = maxcol - curcol
         let spaceStr = ""
@@ -742,7 +742,7 @@ map <F4> ,getfileotherwin
 
 
 nn ,getfilethiswin :call GetFileInThisWindow()<NL>
-map <S-F4> ,getfilethiswin 
+map <S-F4> ,getfilethiswin
 
 
 fun! GetFileInOtherWindow()
@@ -782,7 +782,7 @@ fun! AddPath()
     call RestorePath()
   endif
   let g:pathShouldBeCorrected = 1
-  
+
   let g:oldPath = &path
   let pathadd = fnamemodify(bufname('%'), ':p')
 
@@ -859,7 +859,7 @@ function! GetSmartFilename_old()
   endwhile
 
 
-  if (higher > lower) 
+  if (higher > lower)
     return strpart(line, lower, higher-lower)
   else
     return ""
@@ -895,7 +895,7 @@ if !exists("g:singleinit")
     let &comments=&comments.',fb:'.i.')'
     let i = i + 1
   endwhile
-  
+
   " Some more text style bullets
   set comments+=fb:-
   set comments+=fb:--
@@ -906,7 +906,7 @@ noremap <M--> <C-X>
 
 
 map ,rnum r1jr2jr3jr4jr5jr6jr7jr8jr9
-map ,rose mz:%s/Vec3/CVector3/ge<CR> :%s/^ \+//ge<CR> :%s/{.*}//ge<CR> :%s/;[^;]*$//ge<CR> :%s/\/\/.*$//ge<CR> :%s/^inline//ge<CR> :%s/\(^.*\) \([^ ]*\) *(\(.*\)$/\2(\3 : \1/e<CR> :%s/\([(,]\) *\([^,)]\+\) \+\([^,)]\+\) */\1 \3 : \2 /ge<CR>:noh<CR>`z 
+map ,rose mz:%s/Vec3/CVector3/ge<CR> :%s/^ \+//ge<CR> :%s/{.*}//ge<CR> :%s/;[^;]*$//ge<CR> :%s/\/\/.*$//ge<CR> :%s/^inline//ge<CR> :%s/\(^.*\) \([^ ]*\) *(\(.*\)$/\2(\3 : \1/e<CR> :%s/\([(,]\) *\([^,)]\+\) \+\([^,)]\+\) */\1 \3 : \2 /ge<CR>:noh<CR>`z
 
 map ,fixname :let @z = fnamemodify(bufname("%"), ":p:")<CR>:bd<CR>:e <C-R>z<CR>
 map ,ea :set ea<CR>:set noea<CR>:<BS>
@@ -916,7 +916,7 @@ set shm+=I
 set shm+=a
 let singleinit=1
 
-"map ,print y:let @x = expand("%:p")<CR>:new<CR>P:let @z = substitute(tempname(), "tmp$", "cpp","")<CR>:w! <C-R>z<CR>:let @y = expand("%:p:h") .  "\\out.ps"<CR>:!a2ps -f7 --center-title="<C-R>x" -o <C-R>y <C-R>z<CR>:!<C-R>y<CR>:bd!<CR>:!del <C-R>z <C-R>y<CR> 
+"map ,print y:let @x = expand("%:p")<CR>:new<CR>P:let @z = substitute(tempname(), "tmp$", "cpp","")<CR>:w! <C-R>z<CR>:let @y = expand("%:p:h") .  "\\out.ps"<CR>:!a2ps -f7 --center-title="<C-R>x" -o <C-R>y <C-R>z<CR>:!<C-R>y<CR>:bd!<CR>:!del <C-R>z <C-R>y<CR>
  map ,print y:let @x = expand("%:p")<CR>:new<CR>P:let @z = substitute(tempname(), "tmp$", "cpp","")<CR>:w! <C-R>z<CR>:!PRFILE32 %<CR>:!del <C-R>z<C-R>:bd!<CR>
 
 
@@ -1132,7 +1132,7 @@ fun! PutPrependedFunc()
   let classname = FindCurrentFunction(1)
   let classname = matchstr(classname, '\w\+\s*::')
 
-  let multi_line = strtrans(@0) 
+  let multi_line = strtrans(@0)
   let match_template = '\S\+\s*('
 
   let result = ""
@@ -1184,9 +1184,9 @@ map ,puf :call PutPrependedFunc()<CR>
 
 
 
-" ----------------------------------------------------------------------------- 
+" -----------------------------------------------------------------------------
 "                       C++ Language helper functions
-" ----------------------------------------------------------------------------- 
+" -----------------------------------------------------------------------------
 
 " C++ casts
 map ,cshort  wbistatic_cast<short>(<ESC>ea)<ESC>
@@ -1204,7 +1204,7 @@ map <F12> ,unp
 " create a stub c++ program
 map ,main :set ft=cpp<CR>I#include <iostream><CR><CR>namespace<CR>{<CR>}<CR><CR>int main()<CR>{<CR>}<CR><ESC>2k
 
-" ----------------------------------------------------------------------------- 
+" -----------------------------------------------------------------------------
 
 fun SelectProjectConfig()
    let projectfiles=globpath($HOME."/.vimprojects/","*")
@@ -1212,7 +1212,7 @@ fun SelectProjectConfig()
       call confirm("No project files to load!", "ok", 1)
    else
       let selectedproject=confirm("Which project would you like to load?", projectfiles, 1, "Question")
-      
+
       if(selectedproject != 0)
          let projects=split(projectfiles,"\n")
          exec ":source ".projects[selectedproject - 1]
