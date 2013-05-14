@@ -6,8 +6,9 @@ colorscheme torte
 " Set a reasonable color scheme for the UGLY autocompletion popup
 highlight Pmenu guibg=brown gui=bold 
 
-set lines=1000  " gvim automatically limits its height, this basically
+set lines=100   " gvim automatically limits its height, this basically
                 " means 'as tall as possible'
+                " THIS WAS 1000, BUT CAUSING PROBLEMS IN UNITY
 set co=80
 
 " These resize the gvim window itself.  The CTRL-SHIFT versions for
