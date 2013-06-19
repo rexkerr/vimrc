@@ -473,8 +473,7 @@ map ,egvimrc :edit   $HOME/.gvimrc<NL>
 " TODO:  Move this to a machine specific file
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" map ,ahk :e C:\Program Files\AutoHotkey\AutoHotkey.ini<CR>:set ft=autohotkey<CR>
-map ,ahk :e $HOME\My Documents\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
+map ,ahk :e $DOCUMENTS\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
 
 " Swap the word under the cursor with the current buffer
 map ,sw ciw<C-R>0<ESC>
