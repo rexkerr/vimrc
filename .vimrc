@@ -535,10 +535,6 @@ map ,_nuncomment :normal ,_uncomment<NL>
 " TODO:  Move this to a company specific file...
 map ,cw <ESC>mzggO// Copyright (c) 2013, <COMPANY NAME>, All Rights Reserved<ESC>`z
 
-" Remove all rational rose comments and extra spaces inserted by rose
-map ,norose :%s@^.*//##.*\n\(\s*\n\)*@@ge<CR>
-vmap ,norose :s@^.*//##.*\n\(\s*\n\)*@@ge<CR>
-
 " Backup, checkout, and merge local writable copy of a file
 map ,merge :!copy % %.backup.cpp<CR>:!attrib +r %<CR>,co:!"\Program Files\winmerge\winmerge" % %.backup.cpp<CR>
 
@@ -546,13 +542,12 @@ map ,bgswap :let &background = ( &background == "dark"? "light" : "dark" )<CR>
 
 
 " for C++
-ab p_b push_back
 ab d_c< dynamic_cast<
 ab s_c< static_cast<
 ab r_c< reinterpret_cast<
-ab vectint std::vector< int >
-ab vectfloat std::vector< float >
-ab vectdouble std::vector< double >
+ab vectint std::vector<int>
+ab vectfloat std::vector<float>
+ab vectdouble std::vector<double>
 
 map ,dos2unix mz:%s/<C-Q><C-M>$//g<NL>:noh<NL>`z
 "map ,tblfmt :perl -S tblfmt.pl "FS=," "OFS= | "
@@ -905,9 +900,6 @@ noremap <M-=> <C-A>
 noremap <M--> <C-X>
 
 
-map ,rnum r1jr2jr3jr4jr5jr6jr7jr8jr9
-map ,rose mz:%s/Vec3/CVector3/ge<CR> :%s/^ \+//ge<CR> :%s/{.*}//ge<CR> :%s/;[^;]*$//ge<CR> :%s/\/\/.*$//ge<CR> :%s/^inline//ge<CR> :%s/\(^.*\) \([^ ]*\) *(\(.*\)$/\2(\3 : \1/e<CR> :%s/\([(,]\) *\([^,)]\+\) \+\([^,)]\+\) */\1 \3 : \2 /ge<CR>:noh<CR>`z
-
 map ,fixname :let @z = fnamemodify(bufname("%"), ":p:")<CR>:bd<CR>:e <C-R>z<CR>
 map ,ea :set ea<CR>:set noea<CR>:<BS>
 map ,go [<C-I>
@@ -1223,7 +1215,5 @@ fun SelectProjectConfig()
 endfun
 
 map ,proj :call SelectProjectConfig()<CR>
-
-
 
 " vim: nowrap
