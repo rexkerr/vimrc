@@ -274,6 +274,10 @@ augroup LargeFile
    \ endif
 augroup END
 
+" Make the statusline red for read-only files and blue for read-write files -- also makes the filename on the tab red
+au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guifg=Red guibg=black ctermbg=black ctermfg=red | :else | hi StatusLine guibg=White guifg=blue ctermbg=white ctermfg=blue | endif 
+au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=Red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
+
 map ,py :!python %<CR>
 
 set grepprg=egrep\ -n
