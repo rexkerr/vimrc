@@ -127,6 +127,8 @@ set nrformats-=octal         " Used with CTRL-A and CTRL-X to increment and decr
 syntax on                    " Syntax highlighting
 set hlsearch                 " Highlight Search, highlight all matches when searching
 set is                       " Incremental Search (show next search result as you type it
+set linebreak                " Cause wrap to wrap in a sane way (break on word, rather than mid-word)
+set showbreak=\ \ >>>\ 
 
 if has("win32")
   source $VIMRUNTIME/mswin.vim
@@ -508,8 +510,8 @@ map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 
 "map ,:: O<ESC>"%p$?\.<NL>Dbd0A::<ESC>gJ:noh<NL>
 map ,:: :let @" = expand("%:r") . "::"<CR>:<BS>P
-map ,iifdef O<ESC>"%p$?\.<NL>Dbd00gU$A_H<ESC>,ifdef<NL>:noh<NL>
-map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGp`z:noh<NL>
+map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H<ESC>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
+map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
 
 
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
@@ -1197,7 +1199,7 @@ map ,main :set ft=cpp<CR>I#include <iostream><CR><CR>namespace<CR>{<CR>}<CR><CR>
 
 " -----------------------------------------------------------------------------
 
-fun SelectProjectConfig()
+fun! SelectProjectConfig()
    let projectfiles=globpath($HOME."/.vimprojects/","*")
    if(projectfiles=='')
       call confirm("No project files to load!", "ok", 1)
