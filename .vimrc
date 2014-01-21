@@ -232,10 +232,9 @@ augroup END
 
 augroup Latex
    au!
-   au BufWrite,BufNewFile,Bufread,BufEnter *.tex set nowrap
    au BufWrite,BufNewFile,Bufread,BufEnter *.tex set foldmethod=marker
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex let comment_string = "%"
-   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\."
+   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc"
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex highlight texUseProperTags guibg=#D00000 guifg=White
    if(v:version >= 700)
       au BufWrite,BufNewFile,BufRead,BufEnter *.tex set spell
