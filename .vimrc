@@ -321,7 +321,7 @@ fu! PlusOpt(opt)
 endf
 
 
-set listchars=tab:��,trail:�
+set listchars=tab:»·,trail:·
 
 map ,getbom :execute("edit " . g:reference_dir . g:bom_file)<CR>
 map ,getnt :execute("edit " . g:reference_dir . g:nt_file)<CR>
@@ -429,19 +429,35 @@ map <C-DOWN> <C-W>j
 map <C-UP> <C-W>k
 map <C-LEFT> <C-W>h
 map <C-RIGHT> <C-W>l
-map <M-j> <C-W>j
-map <M-k> <C-W>k
-map <M-h> <C-W>h
-map <M-l> <C-W>l
+
+if(has("mac"))
+   map ∆ <C-W>j
+   map ˚ <C-W>k
+   map ˙ <C-W>h
+   map ¬ <C-W>l
+else
+   map <M-j> <C-W>j
+   map <M-k> <C-W>k
+   map <M-h> <C-W>h
+   map <M-l> <C-W>l
+endif
 
 imap <C-DOWN> <ESC><C-W>j
 imap <C-UP> <ESC><C-W>k
 imap <C-LEFT> <ESC><C-W>h
 imap <C-RIGHT> <ESC><C-W>l
-imap <M-j> <ESC><C-W>j
-imap <M-k> <ESC><C-W>k
-imap <M-h> <ESC><C-W>h
-imap <M-l> <ESC><C-W>l
+
+if(has("mac"))
+   imap ∆ <ESC><C-W>j
+   imap ˚ <ESC><C-W>k
+   imap ˙ <ESC><C-W>h
+   imap ¬ <ESC><C-W>l
+else
+   imap <M-j> <ESC><C-W>j
+   imap <M-k> <ESC><C-W>k
+   imap <M-h> <ESC><C-W>h
+   imap <M-l> <ESC><C-W>l
+endif
 
 " Increase/Decrease the window size a bit
 map <C-S-UP> 5<C-W>+
@@ -518,7 +534,11 @@ map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC
 
 
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
-imap <M-[> {<NL>}<ESC>O
+if(has("mac"))
+   imap “ {<NL>}<ESC>O
+else
+   imap <M-[> {<NL>}<ESC>O
+endif
 
 
 "map ,fixconeline 0i<C-F><ESC>
@@ -1009,7 +1029,11 @@ fu! FindCurrentFunction(or_prev)
   return text
 endf
 " Function to put curly braces around a selection
-vmap <M-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+if(has("mac"))
+   vmap “ :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+else
+   vmap <M-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+endif
 
 function! WrapCurlyBracketsVisual() range
   let line1 = a:firstline
