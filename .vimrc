@@ -245,14 +245,31 @@ augroup END
 augroup LogFiles
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR\s\+.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL\s\+.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN  ".*<WARN\s\+.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGTEMP  ".*RKTEMP:.*"
 
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGWARN guibg=#FFE900 guifg=#000000
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGWARN  guibg=#FFE900 guifg=#000000
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGERROR guibg=#F77B7D guifg=#000000
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGFATAL guibg=#FF0000 gui=bold guifg=#000000
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
 augroup END
+
+augroup qml
+  au!
+  "au FileType * set formatoptions=tcq nocindent comments&
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set nolisp
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set filetype=javascript syntax=javascript
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set formatoptions=crql nowrap cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cindent
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set number
+  au BufWrite,BufNewFile,Bufread,BufEnter *.qml let comment_string = "//"
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cinkeys=0{,0},:,0#,!^F,o,O,e
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml let c_no_curly_error=1
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set fdc=3
+augroup END
+
 
 " Turn off syntax highlighting, etc. for large files
 let g:LargeFile= 10     " in megabytes
