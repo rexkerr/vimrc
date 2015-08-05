@@ -598,6 +598,8 @@ map ,ic :call ToggleOption("ignorecase")<NL><C-L>
 map ,ai :call ToggleOption("autoindent")<NL><C-L>
 map ,rap :call ToggleOption("wrap")<NL><C-L>
 map ,nu :call ToggleOption("number")<NL><C-L>
+map ,cuc : call ToggleOption("cuc")<NL><C-L>
+map ,cul : call ToggleOption("cul")<NL><C-L>
 
 if(v:version >= 700)
   map ,sp :call ToggleOption("spell")<NL><C-L>
