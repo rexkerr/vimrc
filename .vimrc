@@ -337,7 +337,7 @@ fu! PlusOpt(opt)
   endif
 endf
 
-set listchars=tab:��,trail:�
+set listchars=tab:»·,trail:·
 
 map ,getbom :execute("edit " . g:reference_dir . g:bom_file)<CR>
 map ,getnt :execute("edit " . g:reference_dir . g:nt_file)<CR>
@@ -447,10 +447,10 @@ map <C-LEFT> <C-W>h
 map <C-RIGHT> <C-W>l
 
 if(has("mac"))
-   map <A-j> <C-W>j
-   map <A-k> <C-W>k
-   map <A-h> <C-W>h
-   map <A-l> <C-W>l
+   map ∆ <C-W>j
+   map ˚ <C-W>k
+   map ˙ <C-W>h
+   map ¬ <C-W>l
 else
    map <M-j> <C-W>j
    map <M-k> <C-W>k
@@ -464,10 +464,10 @@ imap <C-LEFT> <ESC><C-W>h
 imap <C-RIGHT> <ESC><C-W>l
 
 if(has("mac"))
-   imap <A-j> <ESC><C-W>j
-   imap <A-k> <ESC><C-W>k
-   imap <A-h> <ESC><C-W>h
-   imap <A-l> <ESC><C-W>l
+   imap ∆ <ESC><C-W>j
+   imap ˚ <ESC><C-W>k
+   imap ˙ <ESC><C-W>h
+   imap ¬ <ESC><C-W>l
 else
    imap <M-j> <ESC><C-W>j
    imap <M-k> <ESC><C-W>k
@@ -551,7 +551,7 @@ map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC
 
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
 if(has("mac"))
-   imap <A-[> {<NL>}<ESC>O
+   imap “ {<NL>}<ESC>O
 else
    imap <M-[> {<NL>}<ESC>O
 endif
