@@ -162,6 +162,7 @@ augroup cprog
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set syntax=cpp.doxygen
   au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let comment_string = "//"
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set cinkeys=0{,0},:,0#,!^F,o,O,e
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let c_no_curly_error=1
   "au BufWrite,BufNewFile,BufRead,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc
   au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
@@ -232,10 +233,10 @@ augroup END
 
 augroup Latex
    au!
-   au BufWrite,BufNewFile,Bufread,BufEnter *.tex set nowrap
    au BufWrite,BufNewFile,Bufread,BufEnter *.tex set foldmethod=marker
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex let comment_string = "%"
-   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\."
+   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc
+"
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex highlight texUseProperTags guibg=#D00000 guifg=White
    if(v:version >= 700)
       au BufWrite,BufNewFile,BufRead,BufEnter *.tex set spell
@@ -245,13 +246,28 @@ augroup END
 augroup LogFiles
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*WARN\s\+-.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*ERROR\s\+-.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*FATAL\s\+-.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGTEMP  ".*RKTEMP:.*"
 
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGWARN guibg=#FFE900 guifg=#000000
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGERROR guibg=#F77B7D guifg=#000000
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGFATAL guibg=#FF0000 gui=bold guifg=#000000
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
+augroup END
+augroup qml
+  au!
+  "au FileType * set formatoptions=tcq nocindent comments&
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set nolisp
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set filetype=javascript syntax=javascript
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set formatoptions=crql nowrap cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cindent
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set number
+  au BufWrite,BufNewFile,Bufread,BufEnter *.qml let comment_string = "//"
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cinkeys=0{,0},:,0#,!^F,o,O,e
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml let c_no_curly_error=1
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set fdc=3
 augroup END
 
 " Turn off syntax highlighting, etc. for large files
@@ -321,8 +337,7 @@ fu! PlusOpt(opt)
   endif
 endf
 
-
-set listchars=tab:��,trail:�
+set listchars=tab:»·,trail:·
 
 map ,getbom :execute("edit " . g:reference_dir . g:bom_file)<CR>
 map ,getnt :execute("edit " . g:reference_dir . g:nt_file)<CR>
@@ -430,19 +445,35 @@ map <C-DOWN> <C-W>j
 map <C-UP> <C-W>k
 map <C-LEFT> <C-W>h
 map <C-RIGHT> <C-W>l
-map <M-j> <C-W>j
-map <M-k> <C-W>k
-map <M-h> <C-W>h
-map <M-l> <C-W>l
+
+if(has("mac"))
+   map ∆ <C-W>j
+   map ˚ <C-W>k
+   map ˙ <C-W>h
+   map ¬ <C-W>l
+else
+   map <M-j> <C-W>j
+   map <M-k> <C-W>k
+   map <M-h> <C-W>h
+   map <M-l> <C-W>l
+endif
 
 imap <C-DOWN> <ESC><C-W>j
 imap <C-UP> <ESC><C-W>k
 imap <C-LEFT> <ESC><C-W>h
 imap <C-RIGHT> <ESC><C-W>l
-imap <M-j> <ESC><C-W>j
-imap <M-k> <ESC><C-W>k
-imap <M-h> <ESC><C-W>h
-imap <M-l> <ESC><C-W>l
+
+if(has("mac"))
+   imap ∆ <ESC><C-W>j
+   imap ˚ <ESC><C-W>k
+   imap ˙ <ESC><C-W>h
+   imap ¬ <ESC><C-W>l
+else
+   imap <M-j> <ESC><C-W>j
+   imap <M-k> <ESC><C-W>k
+   imap <M-h> <ESC><C-W>h
+   imap <M-l> <ESC><C-W>l
+endif
 
 " Increase/Decrease the window size a bit
 map <C-S-UP> 5<C-W>+
@@ -479,7 +510,7 @@ map ,egvimrc :edit   $HOME/.gvimrc<NL>
 " TODO:  Move this to a machine specific file
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map ,ahk :e $DOCUMENTS\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
+map ,ahk :e $USERPROFILE\DOCUMENTS\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
 
 " Swap the word under the cursor with the current buffer
 map ,sw ciw<C-R>0<ESC>
@@ -519,7 +550,11 @@ map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC
 
 
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
-imap <M-[> {<NL>}<ESC>O
+if(has("mac"))
+   imap “ {<NL>}<ESC>O
+else
+   imap <M-[> {<NL>}<ESC>O
+endif
 
 
 "map ,fixconeline 0i<C-F><ESC>
@@ -563,6 +598,8 @@ map ,ic :call ToggleOption("ignorecase")<NL><C-L>
 map ,ai :call ToggleOption("autoindent")<NL><C-L>
 map ,rap :call ToggleOption("wrap")<NL><C-L>
 map ,nu :call ToggleOption("number")<NL><C-L>
+map ,cuc : call ToggleOption("cuc")<NL><C-L>
+map ,cul : call ToggleOption("cul")<NL><C-L>
 
 if(v:version >= 700)
   map ,sp :call ToggleOption("spell")<NL><C-L>
@@ -1010,7 +1047,11 @@ fu! FindCurrentFunction(or_prev)
   return text
 endf
 " Function to put curly braces around a selection
-vmap <M-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+if(has("mac"))
+   vmap “ :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+else
+   vmap <M-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+endif
 
 function! WrapCurlyBracketsVisual() range
   let line1 = a:firstline
