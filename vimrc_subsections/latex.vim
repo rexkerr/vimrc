@@ -5,7 +5,8 @@
 "
 " ----------------------------------------------------------------------------- 
 map ,dvi ,cd<CR>:!texify --clean --run-viewer %<CR>
-map ,pdf ,cd<CR>:!texify --clean --pdf --run-viewer %<CR>
+"map ,pdf ,cd<CR>:!texify --clean --pdf --run-viewer %<CR>
+map ,pdf ,cd<CR>:!latexmk --pv --pdf -shell-escape %<CR>
 map ,tt ebi\texttt{<ESC>ea}<ESC>
 map ,tbf ebi\textbf{<ESC>ea}<ESC>
 map ,tit ebi\textit{<ESC>ea}<ESC>

@@ -514,7 +514,7 @@ map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 
 "map ,:: O<ESC>"%p$?\.<NL>Dbd0A::<ESC>gJ:noh<NL>
 map ,:: :let @" = expand("%:r") . "::"<CR>:<BS>P
-map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H<ESC>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
+map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H_<ESC>:r!uuidgen<CR>kgJviWUviW:s/-/_/g<CR>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
 map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
 
 
