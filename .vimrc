@@ -243,8 +243,7 @@ augroup Latex
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.tex set foldmethod=marker
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex let comment_string = "%"
-   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc
-"
+   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc"
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex highlight texUseProperTags guibg=#D00000 guifg=White
    if(v:version >= 700)
       au BufWrite,BufNewFile,BufRead,BufEnter *.tex set spell
@@ -553,7 +552,7 @@ map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 
 "map ,:: O<ESC>"%p$?\.<NL>Dbd0A::<ESC>gJ:noh<NL>
 map ,:: :let @" = expand("%:r") . "::"<CR>:<BS>P
-map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H<ESC>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
+map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H_<ESC>:r!uuidgen<CR>kgJviWUviW:s/-/_/g<CR>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
 map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
 
 
@@ -581,7 +580,7 @@ map ,_uncomment :let @z = @/<CR>:s/^\(\s*\)<C-R>=escape(comment_string, '/')<CR>
 map ,_nuncomment :normal ,_uncomment<NL>
 
 " TODO:  Move this to a company specific file...
-map ,cw <ESC>mzggO// Copyright (c) 2014, Volcano Corporation, All Rights Reserved<ESC>`z
+map ,cw <ESC>mzggO// Copyright (c) 2013, <COMPANY NAME>, All Rights Reserved<ESC>`z
 
 " Backup, checkout, and merge local writable copy of a file
 map ,merge :!copy % %.backup.cpp<CR>:!attrib +r %<CR>,co:!"\Program Files\winmerge\winmerge" % %.backup.cpp<CR>
