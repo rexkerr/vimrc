@@ -90,7 +90,15 @@ if !filereadable(host_config_file)
 
    let host_config_lines=[]
    let host_config_lines=host_config_lines+["\"-------- fonts --------"]
-   let host_config_lines=host_config_lines+["let font_base=\"Consolas\""]
+
+   if(has("mac"))
+      let host_config_lines=host_config_lines+["let font_base=\"Monaco\""]
+   elseif(has("unix"))
+      let host_config_lines=host_config_lines+["let font_base=\"Ubuntu Mono\""]
+   else
+      let host_config_lines=host_config_lines+["let font_base=\"Consolas\""]
+   endif
+
    let host_config_lines=host_config_lines+["let initialfontindex=2"]
    let host_config_lines=host_config_lines+[""]
    let host_config_lines=host_config_lines+["\"-------- other --------"]
@@ -736,11 +744,15 @@ function! CycleFonts(amount)
    let g:fontindex = g:fontindex + a:amount
    let g:fontindex = max([g:fontindex, 0])
    let g:fontindex = min([g:fontindex, len(sizes) - 1])
-   if(has("unix"))
+
+   if(has("mac"))
+      let f = g:font_base . ":h" . sizes[g:fontindex]
+   elseif(has("unix"))
       let f = g:font_base . " " . sizes[g:fontindex]
    else
       let f = g:font_base . ":h" . sizes[g:fontindex]
    endif
+
    let &guifont = f
 endfunction
 
