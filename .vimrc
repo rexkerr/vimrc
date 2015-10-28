@@ -90,7 +90,15 @@ if !filereadable(host_config_file)
 
    let host_config_lines=[]
    let host_config_lines=host_config_lines+["\"-------- fonts --------"]
-   let host_config_lines=host_config_lines+["let font_base=\"Consolas\""]
+
+   if(has("mac"))
+      let host_config_lines=host_config_lines+["let font_base=\"Monaco\""]
+   elseif(has("unix"))
+      let host_config_lines=host_config_lines+["let font_base=\"Ubuntu Mono\""]
+   else
+      let host_config_lines=host_config_lines+["let font_base=\"Consolas\""]
+   endif
+
    let host_config_lines=host_config_lines+["let initialfontindex=2"]
    let host_config_lines=host_config_lines+[""]
    let host_config_lines=host_config_lines+["\"-------- other --------"]
@@ -210,6 +218,7 @@ augroup Python
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set nolisp
   au BufWrite,BufNewFile,Bufread,BufEnter *.py inoremap <buffer> # X<BS>#
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set nocindent smartindent
+  au BufWrite,BufNewFile,BufRead,BufEnter *.py set number
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set shiftwidth=4 softtabstop=4 tabstop=4 tw=0 nowrap et
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set cinwords=if,elif,else,for,while,try,except,finally,def,class
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set formatoptions=crq2
@@ -240,8 +249,7 @@ augroup Latex
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.tex set foldmethod=marker
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex let comment_string = "%"
-   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc
-"
+   au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc"
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex highlight texUseProperTags guibg=#D00000 guifg=White
    if(v:version >= 700)
       au BufWrite,BufNewFile,BufRead,BufEnter *.tex set spell
@@ -342,7 +350,7 @@ fu! PlusOpt(opt)
   endif
 endf
 
-set listchars=tab:»·,trail:·
+set listchars=tab:Â»Â·,trail:Â·
 
 map ,getbom :execute("edit " . g:reference_dir . g:bom_file)<CR>
 map ,getnt :execute("edit " . g:reference_dir . g:nt_file)<CR>
@@ -358,7 +366,14 @@ map ,fname :let @* = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
 
 map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
-if has("unix")
+if(has("mac"))
+   set dir=~/.vim/vimswap
+   set bdir=~/.vim/vimswap
+   set udir=~/.vim/vimswap
+  if !isdirectory(&dir)
+    execute("!mkdir " . &dir)
+  endif
+elseif has("unix")
 "   set dir=$TEMP
 "   set bdir=$TEMP
 else
@@ -446,39 +461,16 @@ map ,> :%:s/^[> ]*//ge<NL>:noh<NL>
 map ,$> :.,$:s/^[> ]*//ge<NL>:noh<NL>
 
 " Move between buffers
-map <C-DOWN> <C-W>j
-map <C-UP> <C-W>k
-map <C-LEFT> <C-W>h
-map <C-RIGHT> <C-W>l
-
-if(has("mac"))
-   map <A-j> <C-W>j
-   map <A-k> <C-W>k
-   map <A-h> <C-W>h
-   map <A-l> <C-W>l
-else
-   map <M-j> <C-W>j
-   map <M-k> <C-W>k
-   map <M-h> <C-W>h
-   map <M-l> <C-W>l
-endif
-
-imap <C-DOWN> <ESC><C-W>j
-imap <C-UP> <ESC><C-W>k
-imap <C-LEFT> <ESC><C-W>h
-imap <C-RIGHT> <ESC><C-W>l
-
-if(has("mac"))
-   imap <A-j> <ESC><C-W>j
-   imap <A-k> <ESC><C-W>k
-   imap <A-h> <ESC><C-W>h
-   imap <A-l> <ESC><C-W>l
-else
-   imap <M-j> <ESC><C-W>j
-   imap <M-k> <ESC><C-W>k
-   imap <M-h> <ESC><C-W>h
-   imap <M-l> <ESC><C-W>l
-endif
+silent! unmap! <C-V>
+silent! no-unmap! <C-V>
+map <C-S-j> <C-W>j
+map <C-S-k> <C-W>k
+map <C-S-h> <C-W>h
+map <C-S-l> <C-W>l
+imap <C-S-j> <ESC><C-W>j
+imap <C-S-k> <ESC><C-W>k
+imap <C-S-h> <ESC><C-W>h
+imap <C-S-l> <ESC><C-W>l
 
 " Increase/Decrease the window size a bit
 map <C-S-UP> 5<C-W>+
@@ -550,13 +542,13 @@ map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 
 "map ,:: O<ESC>"%p$?\.<NL>Dbd0A::<ESC>gJ:noh<NL>
 map ,:: :let @" = expand("%:r") . "::"<CR>:<BS>P
-map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H<ESC>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
+map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H_<ESC>:r!uuidgen<CR>kgJviWUviW:s/-/_/g<CR>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
 map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
 
 
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
 if(has("mac"))
-   imap <A-[> {<NL>}<ESC>O
+   imap <D-[> {<NL>}<ESC>O
 else
    imap <M-[> {<NL>}<ESC>O
 endif
@@ -578,7 +570,7 @@ map ,_uncomment :let @z = @/<CR>:s/^\(\s*\)<C-R>=escape(comment_string, '/')<CR>
 map ,_nuncomment :normal ,_uncomment<NL>
 
 " TODO:  Move this to a company specific file...
-map ,cw <ESC>mzggO// Copyright (c) 2014, Volcano Corporation, All Rights Reserved<ESC>`z
+map ,cw <ESC>mzggO// Copyright (c) 2013, <COMPANY NAME>, All Rights Reserved<ESC>`z
 
 " Backup, checkout, and merge local writable copy of a file
 map ,merge :!copy % %.backup.cpp<CR>:!attrib +r %<CR>,co:!"\Program Files\winmerge\winmerge" % %.backup.cpp<CR>
@@ -603,12 +595,12 @@ map ,ic :call ToggleOption("ignorecase")<NL><C-L>
 map ,ai :call ToggleOption("autoindent")<NL><C-L>
 map ,rap :call ToggleOption("wrap")<NL><C-L>
 map ,nu :call ToggleOption("number")<NL><C-L>
+map ,cuc : call ToggleOption("cuc")<NL><C-L>
+map ,cul : call ToggleOption("cul")<NL><C-L>
 
 if(v:version >= 700)
   map ,sp :call ToggleOption("spell")<NL><C-L>
 endif
-
-noremap <C-K> <C-V>
 
 
 vmap ,ali :call AlignThingy()<CR>
@@ -739,11 +731,15 @@ function! CycleFonts(amount)
    let g:fontindex = g:fontindex + a:amount
    let g:fontindex = max([g:fontindex, 0])
    let g:fontindex = min([g:fontindex, len(sizes) - 1])
-   if(has("unix"))
+
+   if(has("mac"))
+      let f = g:font_base . ":h" . sizes[g:fontindex]
+   elseif(has("unix"))
       let f = g:font_base . " " . sizes[g:fontindex]
    else
       let f = g:font_base . ":h" . sizes[g:fontindex]
    endif
+
    let &guifont = f
 endfunction
 
@@ -1051,7 +1047,7 @@ fu! FindCurrentFunction(or_prev)
 endf
 " Function to put curly braces around a selection
 if(has("mac"))
-   vmap â€œ :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+   vmap <D-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
 else
    vmap <M-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
 endif
