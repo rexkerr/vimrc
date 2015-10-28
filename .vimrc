@@ -70,6 +70,8 @@
 " S-F12: Revert
 " M-F12: Reload (built in)
 
+scriptencoding utf-8
+set encoding=utf-8
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
@@ -350,12 +352,7 @@ fu! PlusOpt(opt)
   endif
 endf
 
-set listchars=tab:»·,trail:·
-
-map ,getbom :execute("edit " . g:reference_dir . g:bom_file)<CR>
-map ,getnt :execute("edit " . g:reference_dir . g:nt_file)<CR>
-
-
+set listchars=trail:·,precedes:«,extends:»,tab:▸\ 
 
 set textwidth=70
 map ,fdos :set fileformat=dos<NL>
@@ -461,16 +458,16 @@ map ,> :%:s/^[> ]*//ge<NL>:noh<NL>
 map ,$> :.,$:s/^[> ]*//ge<NL>:noh<NL>
 
 " Move between buffers
-silent! unmap! <C-V>
-silent! no-unmap! <C-V>
-map <C-S-j> <C-W>j
-map <C-S-k> <C-W>k
-map <C-S-h> <C-W>h
-map <C-S-l> <C-W>l
-imap <C-S-j> <ESC><C-W>j
-imap <C-S-k> <ESC><C-W>k
-imap <C-S-h> <ESC><C-W>h
-imap <C-S-l> <ESC><C-W>l
+silent! unmap <C-V>
+silent! no-unmap <C-V>
+map <M-j> <C-W>j
+map <M-k> <C-W>k
+map <M-h> <C-W>h
+map <M-l> <C-W>l
+imap <M-j> <ESC><C-W>j
+imap <M-k> <ESC><C-W>k
+imap <M-h> <ESC><C-W>h
+imap <M-l> <ESC><C-W>l
 
 " Increase/Decrease the window size a bit
 map <C-S-UP> 5<C-W>+
