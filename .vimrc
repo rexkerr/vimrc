@@ -213,6 +213,7 @@ augroup Python
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set nolisp
   au BufWrite,BufNewFile,Bufread,BufEnter *.py inoremap <buffer> # X<BS>#
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set nocindent smartindent
+  au BufWrite,BufNewFile,BufRead,BufEnter *.py set number
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set shiftwidth=4 softtabstop=4 tabstop=4 tw=0 nowrap et
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set cinwords=if,elif,else,for,while,try,except,finally,def,class
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set formatoptions=crq2
@@ -360,7 +361,14 @@ map ,fname :let @* = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
 
 map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
-if has("unix")
+if(has("mac"))
+   set dir=~/.vim/vimswap
+   set bdir=~/.vim/vimswap
+   set udir=~/.vim/vimswap
+  if !isdirectory(&dir)
+    execute("!mkdir " . &dir)
+  endif
+elseif has("unix")
 "   set dir=$TEMP
 "   set bdir=$TEMP
 else
@@ -448,39 +456,16 @@ map ,> :%:s/^[> ]*//ge<NL>:noh<NL>
 map ,$> :.,$:s/^[> ]*//ge<NL>:noh<NL>
 
 " Move between buffers
-map <C-DOWN> <C-W>j
-map <C-UP> <C-W>k
-map <C-LEFT> <C-W>h
-map <C-RIGHT> <C-W>l
-
-if(has("mac"))
-   map ∆ <C-W>j
-   map ˚ <C-W>k
-   map ˙ <C-W>h
-   map ¬ <C-W>l
-else
-   map <M-j> <C-W>j
-   map <M-k> <C-W>k
-   map <M-h> <C-W>h
-   map <M-l> <C-W>l
-endif
-
-imap <C-DOWN> <ESC><C-W>j
-imap <C-UP> <ESC><C-W>k
-imap <C-LEFT> <ESC><C-W>h
-imap <C-RIGHT> <ESC><C-W>l
-
-if(has("mac"))
-   imap ∆ <ESC><C-W>j
-   imap ˚ <ESC><C-W>k
-   imap ˙ <ESC><C-W>h
-   imap ¬ <ESC><C-W>l
-else
-   imap <M-j> <ESC><C-W>j
-   imap <M-k> <ESC><C-W>k
-   imap <M-h> <ESC><C-W>h
-   imap <M-l> <ESC><C-W>l
-endif
+silent! unmap! <C-V>
+silent! no-unmap! <C-V>
+map <C-S-j> <C-W>j
+map <C-S-k> <C-W>k
+map <C-S-h> <C-W>h
+map <C-S-l> <C-W>l
+imap <C-S-j> <ESC><C-W>j
+imap <C-S-k> <ESC><C-W>k
+imap <C-S-h> <ESC><C-W>h
+imap <C-S-l> <ESC><C-W>l
 
 " Increase/Decrease the window size a bit
 map <C-S-UP> 5<C-W>+
@@ -558,7 +543,7 @@ map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC
 
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
 if(has("mac"))
-   imap “ {<NL>}<ESC>O
+   imap <D-[> {<NL>}<ESC>O
 else
    imap <M-[> {<NL>}<ESC>O
 endif
@@ -611,8 +596,6 @@ map ,cul : call ToggleOption("cul")<NL><C-L>
 if(v:version >= 700)
   map ,sp :call ToggleOption("spell")<NL><C-L>
 endif
-
-noremap <C-K> <C-V>
 
 
 vmap ,ali :call AlignThingy()<CR>
@@ -1059,7 +1042,7 @@ fu! FindCurrentFunction(or_prev)
 endf
 " Function to put curly braces around a selection
 if(has("mac"))
-   vmap “ :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
+   vmap <D-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
 else
    vmap <M-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
 endif
