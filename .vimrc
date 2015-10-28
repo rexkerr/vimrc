@@ -173,6 +173,11 @@ augroup cprog
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#151010 gui=bold
 augroup END
 
+augroup cmake
+  au!
+  au BufWrite,BufNewFile,BufRead,BufEnter *.cmake set nowrap tw=0
+augroup END
+
 augroup html
   au!
   au BufWrite,BufNewFile,BufRead,BufEnter *.htm,*.html set nowrap tw=0
