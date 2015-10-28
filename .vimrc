@@ -73,6 +73,7 @@
 scriptencoding utf-8
 set encoding=utf-8
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
 "  Clean up old settings in case we're reloading...
@@ -140,10 +141,6 @@ set is                       " Incremental Search (show next search result as yo
 set linebreak                " Cause wrap to wrap in a sane way (break on word, rather than mid-word)
 set showbreak=\ \ >>>\ 
 
-if has("win32")
-  source $VIMRUNTIME/mswin.vim
-endif
-
 let comment_string=""
 set nolisp
 
@@ -164,6 +161,7 @@ augroup END
 augroup cprog
   au!
   "au FileType * set formatoptions=tcq nocindent comments&
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set list
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set nolisp
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set filetype=cpp syntax=cpp
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set formatoptions=crql nowrap cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
@@ -176,11 +174,11 @@ augroup cprog
   "au BufWrite,BufNewFile,BufRead,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc
   au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
-  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
-  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
+  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
+  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
-  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#252525 gui=bold
-  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#151010 gui=bold
+  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#252525 gui=bold
+  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#151010 gui=bold
 augroup END
 
 augroup cmake
@@ -352,7 +350,7 @@ fu! PlusOpt(opt)
   endif
 endf
 
-set listchars=trail:·,precedes:«,extends:»,tab:▸\ 
+set listchars=trail:·,precedes:<,extends:>,tab:→\ 
 
 set textwidth=70
 map ,fdos :set fileformat=dos<NL>
@@ -457,17 +455,6 @@ map ,max :set lines=1000<CR>
 map ,> :%:s/^[> ]*//ge<NL>:noh<NL>
 map ,$> :.,$:s/^[> ]*//ge<NL>:noh<NL>
 
-" Move between buffers
-silent! unmap <C-V>
-silent! no-unmap <C-V>
-map <M-j> <C-W>j
-map <M-k> <C-W>k
-map <M-h> <C-W>h
-map <M-l> <C-W>l
-imap <M-j> <ESC><C-W>j
-imap <M-k> <ESC><C-W>k
-imap <M-h> <ESC><C-W>h
-imap <M-l> <ESC><C-W>l
 
 " Increase/Decrease the window size a bit
 map <C-S-UP> 5<C-W>+
@@ -967,9 +954,6 @@ unmap <C-X>
 map ,s1 :%!perl -S fixdata.pl<CR>
 map ,s2 1G"_dG
 
-" set makeprg=msdev\ C:\PROSIM\ProSim_VPS.dsw\ /make\ \"PROSIM\ -\ Win32\ Debug\"
-
-
 "set errorformat=%f(%l):\.\*
 "source $VIM\tagmenu.vim
 
@@ -1100,11 +1084,6 @@ map ,iepreview :TOhtml<NL>:execute ("saveas " . tempname() . ".html")<CR>,iexplo
 " Don't make me hit enter after compiling!!!
 map ,make :make<CR><CR>
 
-
-" Get rid of stupid Win32 specific mappings
-if has("win32")
-    unmap <C-Y>
-endif
 
 " Working on some new stuff for automatically using the error file
 map ,rembrackets gg/^[<CR>V/^]<CR>dgg/^[<CR>V/^]<CR>d
