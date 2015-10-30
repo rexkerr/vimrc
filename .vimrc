@@ -530,6 +530,14 @@ map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H_<ESC>:r!uuidgen<CR>kgJviWUviW:s/-/_/g
 map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
 
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Useful python header stuff
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map ,pyhead ggO#!/usr/bin/python<CR># -*- coding: utf-8 -*-<ESC>
+ab pyhead #!/usr/bin/python# -*- coding: utf-8 -*-
+
+
+
 "imap <M-[> {<ESC>mza<NL>}<ESC>`za<NL>
 if(has("mac"))
    imap <D-[> {<NL>}<ESC>O
