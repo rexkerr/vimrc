@@ -6,10 +6,10 @@ colorscheme torte
 " Set a reasonable color scheme for the UGLY autocompletion popup
 highlight Pmenu guibg=brown gui=bold 
 
-set lines=100   " gvim automatically limits its height, this basically
-                " means 'as tall as possible'
-                " THIS WAS 1000, BUT CAUSING PROBLEMS IN UNITY
-set co=80
+" set lines=100   " gvim automatically limits its height, this basically
+"                 " means 'as tall as possible'
+"                 " THIS WAS 1000, BUT CAUSING PROBLEMS IN UNITY
+" set co=80
 
 " These resize the gvim window itself.  The CTRL-SHIFT versions for
 " manipulating the split size are stored in the .vimrc since they also
@@ -29,5 +29,8 @@ set go-=e
 " Remove the help menu since I never use it and its accelerator 
 " interferes w/ alt-h, which I use for navigating splits (see .vimrc)
 aunmenu Help
+
+map ,dark :colorscheme torte<cr>:set bg=dark<cr>
+map ,light :colorscheme peachpuff<cr>:set bg=light<cr>
 
 " vim: nowrap
