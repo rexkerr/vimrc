@@ -145,6 +145,7 @@ let comment_string=""
 set nolisp
 
 set background=dark          " I almost always use a black background...
+set visualbell
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -174,11 +175,7 @@ augroup cprog
   "au BufWrite,BufNewFile,BufRead,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc
   au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
-  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
-  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
-  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#252525 gui=bold
-  "au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#151010 gui=bold
 augroup END
 
 augroup cmake
@@ -213,9 +210,16 @@ augroup Perl
   au BufWrite,BufNewFile,BufRead,BufEnter *.pl,*.pm set formatoptions=crql nowrap cindent number
 augroup END
 
+augroup pyc
+    " Ooops... opened that stupid pyc file again in the file browser... no problem!
+    au! 
+    au BufRead *.pyc exec ':edit ' . substitute(bufname("%"), "\.pyc", ".py", "")
+augroup END
+
 augroup Python
   au!
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set nolisp
+  au BufWrite,BufNewFile,Bufread,BufEnter *.py set ft=Python  " for some reason I sometimes don't get syntax highlighting, especially after the *.pyc autocmd
   au BufWrite,BufNewFile,Bufread,BufEnter *.py inoremap <buffer> # X<BS>#
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set nocindent smartindent
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set number
@@ -223,6 +227,12 @@ augroup Python
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set cinwords=if,elif,else,for,while,try,except,finally,def,class
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set formatoptions=crq2
   au BufWrite,BufNewFile,Bufread,BufEnter *.py let comment_string = "#"
+  au BufWrite,BufNewFile,Bufread,BufEnter,FileType python setlocal equalprg=autopep8\ -
+augroup END
+
+augroup json
+  au!
+  au BufWrite,BufNewFile,BufRead,BufEnter,FileType json setlocal equalprg=python\ -m\ json.tool
 augroup END
 
 augroup Matlab
@@ -259,8 +269,9 @@ augroup END
 augroup LogFiles
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*\|.*\<WARNING\>.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*\|.*\<ERROR\>.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR "^Traceback.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGTEMP  ".*RKTEMP:.*"
 
@@ -283,6 +294,34 @@ augroup qml
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set fdc=3
 augroup END
 
+augroup vim_behavior
+   au!
+   au BufEnter,VimResized * call AutoResize()
+augroup END
+
+map <silent> ,ar :call ToggleAutoResize()<CR>
+
+let g:autoResize = 0
+
+fun! ToggleAutoResize()
+   if g:autoResize > 0
+      let g:autoResize = 0
+   else 
+      let g:autoResize = 1
+      call AutoResize()
+   endif 
+
+   echo 'Auto Resize:  '.(g:autoResize?"ON":"OFF")
+endfun
+
+fun! AutoResize()
+   " Don't auto resize if equalalways is on...
+   if !&ea && g:autoResize
+      exe "normal \<c-w>_\<c-w>\|"
+   endif
+endfun
+
+
 " Turn off syntax highlighting, etc. for large files
 let g:LargeFile= 10     " in megabytes
 let g:LargeFile= g:LargeFile*1024*1024
@@ -303,11 +342,51 @@ augroup LargeFile
    \ endif
 augroup END
 
+"Toggle highlighting of stray whitespace
+map <silent> ,ws :call ToggleHightlightStrayWS()<CR>
+
+let g:HighlightStrayWhitespace=1
+
+fun! ToggleHightlightStrayWS()
+   if g:HighlightStrayWhitespace > 0
+      let g:HighlightStrayWhitespace = 0
+   else 
+      let g:HighlightStrayWhitespace = 1
+   endif 
+
+   call UpdateWSHighlights()
+
+   echo 'Highlight Stray WS:  '.(g:HighlightStrayWhitespace?"ON":"OFF")
+endfun
+
+fun! UpdateWSHighlights()
+   if g:HighlightStrayWhitespace > 0
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#454545 gui=bold
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#353030 gui=bold
+
+      syntax match straytabs "\t"
+      syntax match strayspaces "\s\+$"
+      highlight StrayTabs guibg=#454545 gui=bold
+      highlight StraySpaces guibg=#353030 gui=bold
+   else
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax clear straytabs
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax clear strayspaces
+
+      syntax clear straytabs
+      syntax clear strayspaces
+   endif
+endfun
+
+call UpdateWSHighlights()
+
+
 " Make the statusline red for read-only files and blue for read-write files -- also makes the filename on the tab red
 au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guifg=Red guibg=black ctermbg=black ctermfg=red | :else | hi StatusLine guibg=White guifg=blue ctermbg=white ctermfg=blue | endif 
 au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=Red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
 
-map ,py :!python %<CR>
+map ,python :!python %<CR>
 
 set grepprg=egrep\ -n
 
@@ -322,14 +401,27 @@ vmap ,fo %:fo<CR>
 
 " Set up the statusline (stl)
 set stl=%f%h%m%r\ %{Options()}%=%l,%c%V\ %{line('$')}
+"" augroup statusline
+""    au!
+""    au BufEnter,VimResized * call UpdateStatusline()
+"" augroup END
+"" 
+"" function! UpdateStatusline()
+""    if(winwidth(0) > 50)
+""       set stl=%f%h%m%r\ %{Options()}%=%l,%c%V\ %{line('$')}
+""    else
+""       " set stl=%f%h%m%r\ %{Options()}%=%l,%c%V\ %{line('$')}
+""       set stl=%f%h%m%r\ %y%=%l,%c%V\ %{line('$')}
+""    endif
+"" endfun
+
 fu! Options()
   let opt="ai".PlusOpt(&ai)
   let opt=opt." rap".PlusOpt(&wrap)
   let opt=opt." ic".PlusOpt(&ic)
   let opt=opt." et".PlusOpt(&et)
-   if(v:version >= 700)
-     let opt=opt." sp".PlusOpt(&spell)
-   endif
+  let opt=opt." ar".(g:autoResize?"+":"-")
+  let opt=opt." sp".PlusOpt(&spell)
   let opt=opt." ".&ff
   let opt=opt." ".&ft
 
@@ -391,7 +483,6 @@ set bs=2
 set laststatus=2
 set cmdheight=2
 set cinoptions=g0
-set noequalalways
 
 map ,cd :call ConditionalCD()<CR><C-L>:<BS>
 map <F5> ,cd
@@ -671,7 +762,6 @@ function! ToggleOption(option)
   execute ("set inv".option)
 endf
 
-
 function! LoadHeaderOrSrcFile(force_h_cpp)
   let fnew = GetHeaderOrSrcFile(a:force_h_cpp)
   if strlen(fnew) != 0
@@ -934,7 +1024,6 @@ noremap <M--> <C-X>
 
 
 map ,fixname :let @z = fnamemodify(bufname("%"), ":p:")<CR>:bd<CR>:e <C-R>z<CR>
-map ,ea :set ea<CR>:set noea<CR>:<BS>
 map ,go [<C-I>
 
 set shm+=I
@@ -1202,6 +1291,12 @@ map ,puf :call PutPrependedFunc()<CR>
 " An idea to implement...
 " map ,find :new<CR>:r!find . -iname *.cpp -exec grep -Hi <C-R>0 {} ;<CR>
 
+
+" -----------------------------------------------------------------------------
+"                              equalprg formatters
+" -----------------------------------------------------------------------------
+map ,fjson :setlocal equalprg=python\ -m\ json.tool<CR>
+map ,fpy :setlocal equalprg=autopep8\ -<CR>
 
 
 
