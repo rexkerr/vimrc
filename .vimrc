@@ -139,7 +139,8 @@ syntax on                    " Syntax highlighting
 set hlsearch                 " Highlight Search, highlight all matches when searching
 set is                       " Incremental Search (show next search result as you type it
 set linebreak                " Cause wrap to wrap in a sane way (break on word, rather than mid-word)
-set showbreak=\ \ >>>\ 
+set showcmd                  " Show how many lines/characters are selected in visual mode [off by default in mvim]
+set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
 
 let comment_string=""
 set nolisp
@@ -1233,6 +1234,9 @@ fun! IfdefVisual() range
   exec str
 endfun
 
+" selects most recently put text:
+"     http://vim.wikia.com/wiki/Selecting_your_pasted_text
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " takes yanked function definition and creates the implementation for it
 fun! PutPrependedFunc()
