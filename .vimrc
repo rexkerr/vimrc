@@ -267,6 +267,11 @@ augroup Latex
    endif
 augroup END
 
+augroup Markdown
+   au!
+   autocmd BufNewFile,BufRead *.md set filetype=markdown
+augroup END
+
 augroup LogFiles
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
