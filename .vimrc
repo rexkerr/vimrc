@@ -267,17 +267,11 @@ augroup Latex
    endif
 augroup END
 
-augroup Markdown
-   au!
-   autocmd BufNewFile,BufRead *.md set filetype=markdown
-augroup END
-
 augroup LogFiles
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*\|.*\<WARNING\>.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*\|.*\<ERROR\>.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR "^Traceback.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGTEMP  ".*RKTEMP:.*"
 
@@ -312,8 +306,11 @@ let g:autoResize = 0
 fun! ToggleAutoResize()
    if g:autoResize > 0
       let g:autoResize = 0
+      set equalalways
+      exe "normal \<c-w>="
    else 
       let g:autoResize = 1
+      set noequalalways
       call AutoResize()
    endif 
 
@@ -1348,5 +1345,7 @@ fun! SelectProjectConfig()
 endfun
 
 map ,proj :call SelectProjectConfig()<CR>
+
+map - :ex %:h<cr>
 
 " vim: nowrap
