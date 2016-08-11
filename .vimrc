@@ -220,7 +220,7 @@ augroup END
 augroup Python
   au!
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set nolisp
-  au BufWrite,BufNewFile,Bufread,BufEnter *.py set ft=Python  " for some reason I sometimes don't get syntax highlighting, especially after the *.pyc autocmd
+  au BufWrite,BufNewFile,Bufread,BufEnter *.py set ft=python  " for some reason I sometimes don't get syntax highlighting, especially after the *.pyc autocmd
   au BufWrite,BufNewFile,Bufread,BufEnter *.py inoremap <buffer> # X<BS>#
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set nocindent smartindent
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set number
