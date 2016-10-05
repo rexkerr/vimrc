@@ -464,8 +464,8 @@ if(has("mac"))
     execute("!mkdir " . &dir)
   endif
 elseif has("unix")
-"   set dir=$TEMP
-"   set bdir=$TEMP
+    set dir=~/.vim/vimswap//,/var/tmp//,/tmp//,.
+    set bdir=~/.vim/vimswap//,/var/tmp//,/tmp//,.
 else
   set dir=$TEMP\vimswap
   set bdir=$TEMP\vimswap
