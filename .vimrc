@@ -141,6 +141,9 @@ set is                       " Incremental Search (show next search result as yo
 set linebreak                " Cause wrap to wrap in a sane way (break on word, rather than mid-word)
 set showcmd                  " Show how many lines/characters are selected in visual mode [off by default in mvim]
 set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
+set scrolloff=5              " Keep some lines above/below the cursor when scrolling
+inoremap jk <esc>
+inoremap kj <esc>
 
 let comment_string=""
 set nolisp
@@ -452,7 +455,7 @@ map ,fdos :set fileformat=dos<NL>
 map ,funix :set fileformat=unix<NL>
 
 " copy the full filename into the system clipboard
-map ,fname :let @* = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
+map ,fname :let @+ = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
 
 map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
@@ -1158,8 +1161,8 @@ let Tlist_Sort_Type = "name"
 let Tlist_Show_One_File = 1
 let Tlist_Exit_OnlyWindow = 1
 
-" tags configuration
-set tags=/home/rkerr/p4root/tags
+" tags configuration -- TODO:  move to machine/project specific file
+set tags=/home/rkerr/gitroot/tags
 
 if has("unix")
   :nmap ,t :!(cd %:p:h;ctags *.[ch])&
