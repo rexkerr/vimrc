@@ -142,6 +142,9 @@ set is                       " Incremental Search (show next search result as yo
 set linebreak                " Cause wrap to wrap in a sane way (break on word, rather than mid-word)
 set showcmd                  " Show how many lines/characters are selected in visual mode [off by default in mvim]
 set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
+set scrolloff=5              " Keep some lines above/below the cursor when scrolling
+inoremap jk <esc>
+inoremap kj <esc>
 
 let comment_string=""
 set nolisp
@@ -221,7 +224,7 @@ augroup END
 augroup Python
   au!
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set nolisp
-  au BufWrite,BufNewFile,Bufread,BufEnter *.py set ft=Python  " for some reason I sometimes don't get syntax highlighting, especially after the *.pyc autocmd
+  au BufWrite,BufNewFile,Bufread,BufEnter *.py set ft=python  " for some reason I sometimes don't get syntax highlighting, especially after the *.pyc autocmd
   au BufWrite,BufNewFile,Bufread,BufEnter *.py inoremap <buffer> # X<BS>#
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set nocindent smartindent
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set number
@@ -268,17 +271,11 @@ augroup Latex
    endif
 augroup END
 
-augroup Markdown
-   au!
-   autocmd BufNewFile,BufRead *.md set filetype=markdown
-augroup END
-
 augroup LogFiles
    au!
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*\|.*\<WARNING\>.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*\|.*\<ERROR\>.*"
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR "^Traceback.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*"
+   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGTEMP  ".*RKTEMP:.*"
 
@@ -313,8 +310,11 @@ let g:autoResize = 0
 fun! ToggleAutoResize()
    if g:autoResize > 0
       let g:autoResize = 0
+      set equalalways
+      exe "normal \<c-w>="
    else 
       let g:autoResize = 1
+      set noequalalways
       call AutoResize()
    endif 
 
@@ -456,7 +456,7 @@ map ,fdos :set fileformat=dos<NL>
 map ,funix :set fileformat=unix<NL>
 
 " copy the full filename into the system clipboard
-map ,fname :let @* = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
+map ,fname :let @+ = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
 
 map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
@@ -468,8 +468,8 @@ if(has("mac"))
     execute("!mkdir " . &dir)
   endif
 elseif has("unix")
-"   set dir=$TEMP
-"   set bdir=$TEMP
+    set dir=~/.vim/vimswap//,/var/tmp//,/tmp//,.
+    set bdir=~/.vim/vimswap//,/var/tmp//,/tmp//,.
 else
   set dir=$TEMP\vimswap
   set bdir=$TEMP\vimswap
@@ -1162,8 +1162,8 @@ let Tlist_Sort_Type = "name"
 let Tlist_Show_One_File = 1
 let Tlist_Exit_OnlyWindow = 1
 
-" tags configuration
-set tags=/home/rkerr/p4root/tags
+" tags configuration -- TODO:  move to machine/project specific file
+set tags=/home/rkerr/gitroot/tags
 
 if has("unix")
   :nmap ,t :!(cd %:p:h;ctags *.[ch])&
@@ -1349,5 +1349,7 @@ fun! SelectProjectConfig()
 endfun
 
 map ,proj :call SelectProjectConfig()<CR>
+
+map - :ex %:h<cr>
 
 " vim: nowrap
