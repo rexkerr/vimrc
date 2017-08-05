@@ -131,6 +131,7 @@ set viminfo='20,\"50         " Remember up to 20 previous files, 50 lines per re
 set history=50               " keep 50 last commands
 set showtabline=2            " Always show the tabline, even if there is only one tab
 set ruler                    " Show the line & column number of the cursor position
+set number                   " Always show line numbers
 set makeef=$TEMP\vim##.err   " makeeef, make error file
 set swb=useopen              " switchbuf, use already open buffer in current tab
 set nrformats+=alpha         " Used with CTRL-A and CTRL-X to increment and decrement the letter under the cursor
