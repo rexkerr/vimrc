@@ -181,6 +181,8 @@ augroup cprog
   au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
   au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP  ".*RKTEMP.*"
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
 augroup END
 
 augroup cmake
@@ -594,6 +596,9 @@ map ,ahk :e $USERPROFILE\DOCUMENTS\AutoHotkey.ahk<CR>:set ft=autohotkey<CR>
 " Swap the word under the cursor with the current buffer
 map ,sw ciw<C-R>0<ESC>
 
+" Sort the selected lines
+vmap ,s :!sort<CR>
+
 " Mark Swap:  swap word at mark a and mark b
 map ,msw mz`a"zyiw`b"yyiw`aciw<C-R>y<ESC>`bciw<C-R>z<ESC>`z
 
@@ -626,6 +631,9 @@ map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 map ,:: :let @" = expand("%:r") . "::"<CR>:<BS>P
 map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H_<ESC>:r!uuidgen<CR>kgJviWUviW:s/-/_/g<CR>,ifdef<NL>:noh<NL>:g/pragma\s*once/d<CR>
 map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
+
+" Include my header:  Add a #include for the matching header to the top of a cpp file
+map ,imh :0<CR>O#include "<C-R>=expand("%:t:r")<CR>.cpp"<ESC>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1054,10 +1062,6 @@ map ,[I [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 unmap <C-A>
 unmap <C-X>
 
-
-map ,s1 :%!perl -S fixdata.pl<CR>
-map ,s2 1G"_dG
-
 "set errorformat=%f(%l):\.\*
 "source $VIM\tagmenu.vim
 
@@ -1162,8 +1166,8 @@ let Tlist_Sort_Type = "name"
 let Tlist_Show_One_File = 1
 let Tlist_Exit_OnlyWindow = 1
 
-" tags configuration -- TODO:  move to machine/project specific file
-set tags=/home/rkerr/gitroot/tags
+" tags configuration
+set tags=./tags;
 
 if has("unix")
   :nmap ,t :!(cd %:p:h;ctags *.[ch])&
@@ -1171,7 +1175,7 @@ else
   :nmap ,t :!"cd %:p:h & ctags -V *"<CR>
 endif
 
-:nmap ,rtags :!"ctags -R --fields=+i -V -f C:\Development\project\tags C:\Development\project\*"<CR>
+:nmap ,rtags :call GenRTags()<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
@@ -1351,5 +1355,32 @@ endfun
 map ,proj :call SelectProjectConfig()<CR>
 
 map - :ex %:h<cr>
+
+
+fun! FindGitRoot()
+    let gitfolder=expand("%:h")
+
+    while(!isdirectory(gitfolder."/.git"))
+        if(gitfolder == "" || gitfolder == $HOME)
+            return ""
+        endif
+
+        let gitfolder = fnamemodify(gitfolder, ':h')
+
+    endwhile
+
+    return gitfolder
+endfun
+
+fun! GenRTags()
+    let folder = FindGitRoot()
+    if(folder == "")
+		:echohl WarningMsg | echo "Unable to find project root" | echohl None
+        return
+    endif
+
+    echo "Generating tags in:  ".folder
+    silent exec("!ctags -R --fields=+i -f ".folder."/tags ".folder."/*" )
+endfun
 
 " vim: nowrap
