@@ -140,8 +140,10 @@ syntax on                    " Syntax highlighting
 set hlsearch                 " Highlight Search, highlight all matches when searching
 set is                       " Incremental Search (show next search result as you type it
 set linebreak                " Cause wrap to wrap in a sane way (break on word, rather than mid-word)
+set nowrap                   " Don't wrap lines by default
 set showcmd                  " Show how many lines/characters are selected in visual mode [off by default in mvim]
 set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
+set textwidth=0              " never wrap on paste
 set scrolloff=5              " Keep some lines above/below the cursor when scrolling
 inoremap jk <esc>
 inoremap kj <esc>
@@ -166,47 +168,25 @@ augroup END
 
 augroup cprog
   au!
-  "au FileType * set formatoptions=tcq nocindent comments&
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set list
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set nolisp
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set filetype=cpp syntax=cpp
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set formatoptions=crql nowrap cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set cindent
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set number
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set syntax=cpp.doxygen
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set filetype=cpp syntax=cpp.doxygen
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set formatoptions=crql cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
   au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let comment_string = "//"
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set cinkeys=0{,0},:,0#,!^F,o,O,e
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let c_no_curly_error=1
-  "au BufWrite,BufNewFile,BufRead,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc
-  au BufWrite,BufNewFile,BufRead,BufEnter *.c,*.cpp set fdc=3
-  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
-  au bufwrite,bufnewfile,bufread,bufenter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set foldcolumn=3
+  au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
+  au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP  ".*RKTEMP.*"
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
 augroup END
 
 augroup cmake
   au!
-  au BufWrite,BufNewFile,BufRead,BufEnter *.cmake set nowrap tw=0
+  au BufWrite,BufNewFile,Bufread,BufEnter CMakeLists.txt,*.cmake let comment_string="#"
+  au BufWrite,BufNewFile,Bufread,BufEnter CMakeLists.txt,*.cmake set comments=:#
 augroup END
-
-augroup html
-  au!
-  au BufWrite,BufNewFile,BufRead,BufEnter *.htm,*.html set nowrap tw=0
-augroup END
-
-augroup rc
-  au!
-  au BufWrite,BufNewFile,BufRead,BufEnter *.rc set nowrap
-augroup END
-
-augroup plg
-  au!
-  " set errorformat+=%f(%l) : error %t%n: %m
-  au BufWrite,BufNewFile,BufRead,BufEnter *.plg set nowrap
-  au BufWrite,BufNewFile,BufRead,BufEnter *.plg call CleanErrorFile()
-augroup END
-
 
 augroup Perl
   au!
@@ -214,7 +194,7 @@ augroup Perl
   au BufWrite,BufNewFile,Bufread,BufEnter *.pl,*.pm set isk+=$
   au BufWrite,BufNewFile,Bufread,BufEnter *.pl,*.pm let comment_string = "#"
   au BufWrite,BufNewFile,Bufread,BufEnter *.pl,*.pm set cinkeys="0{,0},:,!^F,o,O,e"
-  au BufWrite,BufNewFile,BufRead,BufEnter *.pl,*.pm set formatoptions=crql nowrap cindent number
+  au BufWrite,BufNewFile,BufRead,BufEnter *.pl,*.pm set formatoptions=crql cindent
 augroup END
 
 augroup pyc
@@ -229,8 +209,7 @@ augroup Python
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set ft=python  " for some reason I sometimes don't get syntax highlighting, especially after the *.pyc autocmd
   au BufWrite,BufNewFile,Bufread,BufEnter *.py inoremap <buffer> # X<BS>#
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set nocindent smartindent
-  au BufWrite,BufNewFile,BufRead,BufEnter *.py set number
-  au BufWrite,BufNewFile,BufRead,BufEnter *.py set shiftwidth=4 softtabstop=4 tabstop=4 tw=0 nowrap et
+  au BufWrite,BufNewFile,BufRead,BufEnter *.py set shiftwidth=4 softtabstop=4 tabstop=4 expandtab 
   au BufWrite,BufNewFile,BufRead,BufEnter *.py set cinwords=if,elif,else,for,while,try,except,finally,def,class
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set formatoptions=crq2
   au BufWrite,BufNewFile,Bufread,BufEnter *.py let comment_string = "#"
@@ -242,17 +221,9 @@ augroup json
   au BufWrite,BufNewFile,BufRead,BufEnter,FileType json setlocal equalprg=python\ -m\ json.tool
 augroup END
 
-augroup Matlab
-  au!
-  au BufWrite,BufNewFile,Bufread,BufEnter *.m set nolisp
-  au BufWrite,BufNewFile,Bufread,BufEnter *.m set formatoptions=crq2 tw=0
-  au BufWrite,BufNewFile,Bufread,BufEnter *.m let comment_string = "%"
-augroup END
-
 augroup Vimrc
   au!
   au BufWrite,BufNewFile,Bufread,BufEnter _vimrc,.vimrc,*.vim set nolisp
-  au BufWrite,BufNewFile,Bufread,BufEnter _vimrc,.vimrc,*.vim set tw=0 nowrap
   au BufWrite,BufNewFile,Bufread,BufEnter _vimrc,.vimrc,*.vim let comment_string = "\""
 augroup END
 
@@ -268,14 +239,11 @@ augroup Latex
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex let comment_string = "%"
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex syntax match texUseProperTags "etc[^\}]\|\.\.\.\|etc"
    au BufWrite,BufNewFile,BufRead,BufEnter *.tex highlight texUseProperTags guibg=#D00000 guifg=White
-   if(v:version >= 700)
-      au BufWrite,BufNewFile,BufRead,BufEnter *.tex set spell
-   endif
+   au BufWrite,BufNewFile,BufRead,BufEnter *.tex set spell
 augroup END
 
 augroup LogFiles
    au!
-   au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* set nowrap
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGWARN ".*<WARN\s\+.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGERROR ".*<ERROR.*"
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* syntax match VLOGFATAL ".*<FATAL.*"
@@ -286,18 +254,18 @@ augroup LogFiles
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGFATAL guibg=#FF0000 gui=bold guifg=#000000
    au BufWrite,BufNewFile,Bufread,BufEnter *.log,*.log.* highlight VLOGTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
 augroup END
+
 augroup qml
   au!
   "au FileType * set formatoptions=tcq nocindent comments&
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set nolisp
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set filetype=javascript syntax=javascript
-  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set formatoptions=crql nowrap cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set formatoptions=crql cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cindent
-  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set number
   au BufWrite,BufNewFile,Bufread,BufEnter *.qml let comment_string = "//"
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cinkeys=0{,0},:,0#,!^F,o,O,e
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml let c_no_curly_error=1
-  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set fdc=3
+  au BufWrite,BufNewFile,BufRead,BufEnter *.qml set foldcolumn=3
 augroup END
 
 augroup vim_behavior
@@ -453,7 +421,6 @@ endf
 
 set listchars=trail:·,precedes:<,extends:>,tab:→\ 
 
-set textwidth=70
 map ,fdos :set fileformat=dos<NL>
 map ,funix :set fileformat=unix<NL>
 
@@ -481,17 +448,17 @@ else
 endif
 
 
-set shiftwidth=3
-set tabstop=3
-set showmatch
-set expandtab
-set nowrapscan
+set shiftwidth=4
+set tabstop=4
+set showmatch     " briefly jump to matching bracket
+set expandtab     " replace tabs with spaces
+set nowrapscan    " don't search past end of file
 set ignorecase
-set sm ai
-set bs=2
-set laststatus=2
-set cmdheight=2
-set cinoptions=g0
+set autoindent
+set backspace=2   "  =indent,eol,start
+set laststatus=2  " always show status line on last window
+set cmdheight=2   " number of lines for cmd wndow
+set cinoptions=g0 " scope declarations at column 0 of class
 
 map ,cd :call ConditionalCD()<CR><C-L>:<BS>
 map <F5> ,cd
@@ -640,7 +607,8 @@ map ,imh :0<CR>O#include "<C-R>=expand("%:t:r")<CR>.cpp"<ESC>
 " Useful python header stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map ,pyhead ggO#!/usr/bin/python<CR># -*- coding: utf-8 -*-<ESC>
-ab pyhead #!/usr/bin/python# -*- coding: utf-8 -*-
+ab pyhead #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 
 
@@ -695,10 +663,7 @@ map ,rap :call ToggleOption("wrap")<NL><C-L>
 map ,nu :call ToggleOption("number")<NL><C-L>
 map ,cuc : call ToggleOption("cuc")<NL><C-L>
 map ,cul : call ToggleOption("cul")<NL><C-L>
-
-if(v:version >= 700)
-  map ,sp :call ToggleOption("spell")<NL><C-L>
-endif
+map ,sp :call ToggleOption("spell")<NL><C-L>
 
 
 vmap ,ali :call AlignThingy()<CR>
@@ -1254,7 +1219,7 @@ fun! PutPrependedFunc()
   let &magic = 1
 
   let classname = FindCurrentFunction(1)
-  let classname = matchstr(classname, '\w\+\s*::')
+  let classname = matchstr(classname, '\s*\w\+\s*::')
 
   let multi_line = strtrans(@0)
   let match_template = '\S\+\s*('
@@ -1278,7 +1243,7 @@ fun! PutPrependedFunc()
     if match(single_line, '\S') != -1 && index != -1
       let newfun = strpart(newfun,0,index) . classname . strpart(newfun, index)
       "let newfun = substitute(newfun, match_template, classname.'&', "")
-      let newfun = substitute(newfun, '\(virtual\|static\|;\)', "", "g")
+      let newfun = substitute(newfun, '\(virtual\|static\|override\|;\)', "", "g")
       let newfun = substitute(newfun, "\s*=\s*[^),]*\ze[),]", "", "g")
 
       call append(line(".")-1, newfun)
@@ -1382,5 +1347,3 @@ fun! GenRTags()
     echo "Generating tags in:  ".folder
     silent exec("!ctags -R --fields=+i -f ".folder."/tags ".folder."/*" )
 endfun
-
-" vim: nowrap
