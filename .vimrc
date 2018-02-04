@@ -55,9 +55,9 @@
 " S-F8: Uncomment out selection, or current line
 " M-F8: I forget, what's different here?
 "
-" F9: Open/Close taglist plugin window
-" S-F9: Sync the taglist plugin window
-" M-F9: Go to the taglist plugin window (or leftmost window)
+" F9:   Unused
+" S-F9: Unused
+" M-F9: Unused
 "
 " F10:  Unused
 "
@@ -132,7 +132,6 @@ set history=50               " keep 50 last commands
 set showtabline=2            " Always show the tabline, even if there is only one tab
 set ruler                    " Show the line & column number of the cursor position
 set number                   " Always show line numbers
-set makeef=$TEMP\vim##.err   " makeeef, make error file
 set swb=useopen              " switchbuf, use already open buffer in current tab
 set nrformats+=alpha         " Used with CTRL-A and CTRL-X to increment and decrement the letter under the cursor
 set nrformats-=octal         " Used with CTRL-A and CTRL-X to increment and decrement the letter under the cursor
@@ -145,13 +144,13 @@ set showcmd                  " Show how many lines/characters are selected in vi
 set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
 set textwidth=0              " never wrap on paste
 set scrolloff=5              " Keep some lines above/below the cursor when scrolling
+set grepprg=rg\ --vimgrep    " Use ripgrep
 inoremap jk <esc>
 inoremap kj <esc>
 
 let comment_string=""
 set nolisp
 
-set background=dark          " I almost always use a black background...
 set visualbell
 
 
@@ -162,6 +161,13 @@ set visualbell
 "        and refactor.
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup quixfix
+    " automatically open cwindow after grep/make
+    autocmd!
+    autocmd QuickFixCmdPost [^l]* cwindow
+    autocmd QuickFixCmdPost l*    lwindow
+augroup END
+
 augroup aft
   au BufWrite,BufNewFile,BufRead,BufEnter *.aft set noet
 augroup END
@@ -364,8 +370,6 @@ au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | 
 au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=Red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
 
 map ,python :!python %<CR>
-
-set grepprg=egrep\ -n
 
 " Make * search for the entire highlighted string when in visual select mode, rather than just the word under the cursor
 vmap <silent> * y/<C-R>=substitute(escape(@", '\\/.*$^~[]'), '\n', '\\n', 'g')<CR><CR>
@@ -592,6 +596,7 @@ map ,;j :s/  */;/ge<NL>:noh<NL>
 "remove trailing spaces
 map ,rts :%s/\s\+$//<CR>
 
+" Creates a row of === below the current line, same length as line
 map ,= yyp:s/[^=]/=/ge<NL>:noh<NL>
 
 "map ,:: O<ESC>"%p$?\.<NL>Dbd0A::<ESC>gJ:noh<NL>
@@ -607,8 +612,7 @@ map ,imh :0<CR>O#include "<C-R>=expand("%:t:r")<CR>.cpp"<ESC>
 " Useful python header stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map ,pyhead ggO#!/usr/bin/python<CR># -*- coding: utf-8 -*-<ESC>
-ab pyhead #!/usr/bin/python
-# -*- coding: utf-8 -*-
+ab pyhead #!/usr/bin/python<CR># -*- coding: utf-8 -*-
 
 
 
@@ -636,13 +640,11 @@ map ,_uncomment :let @z = @/<CR>:s/^\(\s*\)<C-R>=escape(comment_string, '/')<CR>
 map ,_nuncomment :normal ,_uncomment<NL>
 
 " TODO:  Move this to a company specific file...
-map ,cw <ESC>mzggO// Copyright (c) 2013, <COMPANY NAME>, All Rights Reserved<ESC>`z
+map ,cw <ESC>mzggO// Copyright (c) 2018, <COMPANY NAME>, All Rights Reserved<ESC>`z
 
-" Backup, checkout, and merge local writable copy of a file
-map ,merge :!copy % %.backup.cpp<CR>:!attrib +r %<CR>,co:!"\Program Files\winmerge\winmerge" % %.backup.cpp<CR>
-
-map ,bgswap :let &background = ( &background == "dark"? "light" : "dark" )<CR>
-
+" this will be overwritten by the .gvimrc if using gvim to change the colorscheme instead
+map ,light :let &background="light"<CR>
+map ,dark :let &background="dark"<CR>
 
 " for C++
 ab d_c< dynamic_cast<
@@ -651,6 +653,7 @@ ab r_c< reinterpret_cast<
 ab vectint std::vector<int>
 ab vectfloat std::vector<float>
 ab vectdouble std::vector<double>
+ab vectstring std::vector<std::string>
 
 map ,dos2unix mz:%s/<C-Q><C-M>$//g<NL>:noh<NL>`z
 "map ,tblfmt :perl -S tblfmt.pl "FS=," "OFS= | "
@@ -1020,7 +1023,6 @@ map ,ubbu mz0I[url="<C-V>"]<ESC>$A[/url]<ESC>`z
 vmap ,ubbq "zxi[quote][/quote]<ESC>7h"zP
 vmap ,ubbu "zxi[url="<C-V>"][/url]<ESC>5h"zP
 
-"myfind . -name "name" -exec "egrep" "-n" "pattern" "{}" ";"
 map ,err :let @z = tempname()<CR>:w! <C-R>z<CR>:cf %<CR>
 map ,[I [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 
@@ -1044,20 +1046,15 @@ vmap <C-J> j
 "example of find, but not in a C++ comment:
 "/^\s*\/\{,1}[^/]\{-}snafu/e
 
-let g:explDetailedList=0
-let g:explSuffixesLast=0
 
 ".bak,~,.o,.h,.info,.swp,.obj
 set suffixes-=.h
 set wildignore+=*~
-let c_minlines=200
 
+" Minimum number of lines to search backwards for syntax highlighting context
+"       http://vim.wikia.com/wiki/Fix_syntax_highlighting
+let c_minlines=500
 
-"set mp=como -A --no_microsoft -D_WCHAR_T_DEFINED -D_MSC_VER -D__cdecl=
-set sp=2>
-
-" Creates mv commands to rename files with %20 in their names to actual spaces
-map ,mst  y$:s/%20/ /g<cr>imv "<esc>A"<esc>0whi <esc>pj0
 
 fu! FindCurrentFunction(or_prev)
   let text =''
@@ -1099,6 +1096,7 @@ fu! FindCurrentFunction(or_prev)
 
   return text
 endf
+
 " Function to put curly braces around a selection
 if(has("mac"))
    vmap <D-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
@@ -1112,24 +1110,6 @@ function! WrapCurlyBracketsVisual() range
   call append(line2, "}")
   call append(line1-1, "{")
 endfun
-
-" taglist configuration
-nnoremap <silent> ,tlist :Tlist<CR>
-nnoremap <silent> <F9> :Tlist<CR>
-nnoremap <silent> <S-F9> :TlistSync<CR>
-nnoremap <A-F9> 10<C-W>h
-
-" TODO:  Move to machine specific file
-if has("unix")
-  let Tlist_Ctags_Cmd = '/usr/bin/ctags-exuberant'
-else
-  let Tlist_Ctags_Cmd = 'c:\vim\ctags.exe'
-endif
-
-let Tlist_Sort_Type = "name"
-" let Tlist_Display_Prototype = 1
-let Tlist_Show_One_File = 1
-let Tlist_Exit_OnlyWindow = 1
 
 " tags configuration
 set tags=./tags;
@@ -1153,24 +1133,6 @@ map ,iexplorer :w<CR>:!"C:\Program Files\Internet Explorer\IEXPLORE.EXE" %<CR>
 " Create HTML syntax highlighting from the current file, save it in a temp file, and launch it in firefox.
 map ,ffpreview :TOhtml<NL>:execute ("saveas " . tempname())<CR>,firefox :q<CR>
 map ,iepreview :TOhtml<NL>:execute ("saveas " . tempname() . ".html")<CR>,iexplorer :q<CR>
-
-" Don't make me hit enter after compiling!!!
-map ,make :make<CR><CR>
-
-
-" Working on some new stuff for automatically using the error file
-map ,rembrackets gg/^[<CR>V/^]<CR>dgg/^[<CR>V/^]<CR>d
-function! CleanErrorFile()
-  silent :%s/<.*>//ge
-  silent g/.obj/de
-  silent g/.lib/de
-  silent g/Creating/de
-  silent g/^$/de
-  silent execute "normal ,rembrackets"
-  "Look at FindCurrentFunction for ways to improve the searching and find the lines to delete
-endfunction
-
-
 
 " Recent stuff to play with
 fun! ReverseRowsVisual() range
@@ -1266,11 +1228,6 @@ map ,puf :call PutPrependedFunc()<CR>
 
 
 
-
-" An idea to implement...
-" map ,find :new<CR>:r!find . -iname *.cpp -exec grep -Hi <C-R>0 {} ;<CR>
-
-
 " -----------------------------------------------------------------------------
 "                              equalprg formatters
 " -----------------------------------------------------------------------------
@@ -1323,7 +1280,7 @@ map - :ex %:h<cr>
 
 
 fun! FindGitRoot()
-    let gitfolder=expand("%:h")
+    let gitfolder=expand("%:p:h")
 
     while(!isdirectory(gitfolder."/.git"))
         if(gitfolder == "" || gitfolder == $HOME)
@@ -1340,10 +1297,11 @@ endfun
 fun! GenRTags()
     let folder = FindGitRoot()
     if(folder == "")
-		:echohl WarningMsg | echo "Unable to find project root" | echohl None
+        :echohl WarningMsg | echo "Unable to find project root" | echohl None
         return
     endif
 
     echo "Generating tags in:  ".folder
     silent exec("!ctags -R --fields=+i -f ".folder."/tags ".folder."/*" )
+    echo "Done generating tags in:  ".folder
 endfun

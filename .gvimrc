@@ -30,7 +30,10 @@ set go-=e
 " interferes w/ alt-h, which I use for navigating splits (see .vimrc)
 aunmenu Help
 
+set background=dark          " I almost always use a black background...
+
 map ,dark :colorscheme torte<cr>:set bg=dark<cr>
 map ,light :colorscheme peachpuff<cr>:set bg=light<cr>
+
 
 " vim: nowrap
