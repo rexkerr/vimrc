@@ -63,7 +63,8 @@
 "
 " F11: Go to next error
 " S-F11: go to previous error
-" M-F11: (??Show status of build??)
+" M-F11: Next error in next file
+" M-F11: Previous error in previous file
 "
 " Deprecated... reused
 " F12: Save file
@@ -468,7 +469,8 @@ map ,cd :call ConditionalCD()<CR><C-L>:<BS>
 map <F5> ,cd
 map <F11> :cn<CR>
 map <s-f11> :cp<CR>
-map <m-F11> 0/([0-9][0-9]*) :<CR>l"zyiw0:noh<CR><F4>:exe "normal <C-R>zG"<CR>:<BS>z<CR>,wj
+map <m-F11> :cnf<CR>
+map <m-s-F11> :cpf<CR>
 
 fun! ConditionalCD()
   if (expand("%:h") != "")
