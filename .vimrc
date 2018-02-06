@@ -44,7 +44,8 @@
 " S-F4: Open filename under the cursor in this window
 "
 " F5: Change the current directory to that of the current file
-" S-F5: Change the current directory to the root directory
+" S-F5: Unused
+" M-F5: Change to project root (based on current file)
 "
 " F6: Swap header/source
 " S-F6: I forget, what's different?
@@ -465,27 +466,40 @@ set laststatus=2  " always show status line on last window
 set cmdheight=2   " number of lines for cmd wndow
 set cinoptions=g0 " scope declarations at column 0 of class
 
-map ,cd :call ConditionalCD()<CR><C-L>:<BS>
+map ,cd :call ConditionalCD()<CR>
 map <F5> ,cd
+map <M-F5> :call ProjectRootCD()<CR>
 map <F11> :cn<CR>
 map <s-f11> :cp<CR>
 map <m-F11> :cnf<CR>
 map <m-s-F11> :cpf<CR>
 
 fun! ConditionalCD()
-  if (expand("%:h") != "")
-    exec("cd %:h")
+  let folder=expand("%:p:h")
+  if (folder != "")
+    exec("cd ".folder)
+    echo "pwd is now:  ".folder
+  else
+    :echohl WarningMsg | echo "Unable to determine path of current file." | echohl None
   endif
 endfun
 
+fun! ProjectRootCD()
+    let folder = FindGitRoot()
+    if(folder == "")
+        :echohl WarningMsg | echo "Unable to find project root." | echohl None
+        return
+    endif
+
+    exec("cd ".folder)
+    echo "Changed to project root folder:  ".folder
+endfun
 
 map ,explorer :call LaunchExplorerPWD()<CR>
 
 fun! LaunchExplorerPWD()
    silent exec("!explorer %:p:h")
 endfun
-
-map <S-F5> :cd \<NL>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
