@@ -186,7 +186,7 @@ augroup cprog
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set foldcolumn=3
   au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
   au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP  ".*RKTEMP.*"
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP ".*RK\(ERR\)\=\s*\(TEMP\|TODO\).*"
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
 augroup END
 
@@ -621,7 +621,7 @@ map ,iifdef ggO<ESC>"%p$?\.<NL>Dbd00gU$A_H_<ESC>:r!uuidgen<CR>kgJviWUviW:s/-/_/g
 map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC>`z:noh<NL>
 
 " Include my header:  Add a #include for the matching header to the top of a cpp file
-map ,imh :0<CR>O#include "<C-R>=expand("%:t:r")<CR>.cpp"<ESC>
+map ,imh :0<CR>O#include "<C-R>=expand("%:t:r")<CR>.h"<ESC>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1062,7 +1062,6 @@ vmap <C-J> j
 "example of find, but not in a C++ comment:
 "/^\s*\/\{,1}[^/]\{-}snafu/e
 
-
 ".bak,~,.o,.h,.info,.swp,.obj
 set suffixes-=.h
 set wildignore+=*~
@@ -1221,7 +1220,7 @@ fun! PutPrependedFunc()
     if match(single_line, '\S') != -1 && index != -1
       let newfun = strpart(newfun,0,index) . classname . strpart(newfun, index)
       "let newfun = substitute(newfun, match_template, classname.'&', "")
-      let newfun = substitute(newfun, '\(virtual\|static\|override\|;\)', "", "g")
+      let newfun = substitute(newfun, '\(override\|virtual\|static\|;\)', "", "g")
       let newfun = substitute(newfun, "\s*=\s*[^),]*\ze[),]", "", "g")
 
       call append(line(".")-1, newfun)
@@ -1304,7 +1303,6 @@ fun! FindGitRoot()
         endif
 
         let gitfolder = fnamemodify(gitfolder, ':h')
-
     endwhile
 
     return gitfolder
