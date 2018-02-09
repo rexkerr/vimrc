@@ -186,8 +186,10 @@ augroup cprog
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set foldcolumn=3
   au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*("
   au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc highlight Dangerous_Stuff guibg=#FF0000 gui=bold
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP ".*RK\(ERR\)\=\s*\(TEMP\|TODO\).*"
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP ".*RK\(ERR\)\=\s*TEMP.*"
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTODO ".*RK\(ERR\)\=\s*TODO.*"
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTODO  guibg=#FFFF00 gui=bold guifg=#000000
 augroup END
 
 augroup cmake
