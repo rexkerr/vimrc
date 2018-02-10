@@ -489,8 +489,12 @@ endfun
 fun! ProjectRootCD()
     let folder = FindGitRoot()
     if(folder == "")
-        :echohl WarningMsg | echo "Unable to find project root." | echohl None
-        return
+        if !exists("g:projectRoot")
+            :echohl WarningMsg | echo "Unable to find project root (set default in hosts as g:projectRoot)." | echohl None
+            return
+        else
+            let folder=g:projectRoot
+        endif
     endif
 
     exec("cd ".folder)
