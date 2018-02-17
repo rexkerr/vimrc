@@ -109,6 +109,19 @@ if !filereadable(host_config_file)
    let host_config_lines=host_config_lines+["\"-------- other --------"]
    let host_config_lines=host_config_lines+["let defaultprojectconfig=$HOME.\"/.vimprojects/default\""]
    let host_config_lines=host_config_lines+[""]
+   let host_config_lines=host_config_lines+["\"---------- plugins ---------"]
+   let host_config_lines=host_config_lines+["set runtimepath^=~/.vim/bundle/Align"]
+   let host_config_lines=host_config_lines+["set runtimepath^=~/.vim/bundle/ctrlp.vim"]
+   let host_config_lines=host_config_lines+["set runtimepath^=~/.vim/bundle/vim-abolish"]
+   let host_config_lines=host_config_lines+["set runtimepath^=~/.vim/bundle/vim-vinegar"]
+   let host_config_lines=host_config_lines+[""]
+   let host_config_lines=host_config_lines+["let g:ctrlp_regexp = 1"]
+   let host_config_lines=host_config_lines+[""]
+   let host_config_lines=host_config_lines+["\"---------- consider moving to project config ---------"]
+   let host_config_lines=host_config_lines+["\" set makeprg=ninja\ -C\ <<project build folder>>"]
+   let host_config_lines=host_config_lines+[""]
+   let host_config_lines=host_config_lines+["\" let g:projectRoot=\"<<project source root folder>>\""]
+   let host_config_lines=host_config_lines+["\" let g:projectName=\"<<project name>>\""]
 
    call writefile(host_config_lines, host_config_file)
 endif
@@ -411,8 +424,13 @@ fu! Options()
   let opt=opt." ".&ft
 
   if &ft==?"cpp" || &ft==?"perl"
-    let text = "{" . FindCurrentFunction(0) . "}"
-    let opt= opt.text
+    let text=" {f:" . FindCurrentFunction(0) . "}"
+    let opt=opt.text
+  endif
+
+  if exists("g:projectName")
+    let text=" {p:" . g:projectName . "}"
+    let opt=opt.text
   endif
 
   return opt
@@ -1296,8 +1314,6 @@ fun! SelectProjectConfig()
 endfun
 
 map ,proj :call SelectProjectConfig()<CR>
-
-map - :ex %:h<cr>
 
 
 fun! FindGitRoot()
