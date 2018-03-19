@@ -202,7 +202,7 @@ augroup cprog
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP ".*RK\(ERR\)\=\s*TEMP.*"
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTEMP  guibg=#6F1DF2 gui=bold guifg=#000000
   au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTODO ".*RK\(ERR\)\=\s*TODO.*"
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTODO  guibg=#FFFF00 gui=bold guifg=#000000
+  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTODO  guibg=#444400 gui=bold guifg=#000000
 augroup END
 
 augroup cmake
@@ -1249,9 +1249,10 @@ fun! PutPrependedFunc()
 
       call append(line(".")-1, newfun)
       call append(line(".")-1, "{")
+      call append(line(".")-1, "    // RKERR TODO:  Implement")
       call append(line(".")-1, "}")
       call append(line(".")-1, "")
-      let lines=lines+4
+      let lines=lines+5
     endif
   endwhile
 
