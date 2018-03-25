@@ -647,6 +647,9 @@ map ,ifdef mzyyppkkI#ifndef <ESC>jI#define <ESC>jI#endif // <ESC>ddGo<ESC>po<ESC
 " Include my header:  Add a #include for the matching header to the top of a cpp file
 map ,imh :0<CR>O#include "<C-R>=expand("%:t:r")<CR>.h"<ESC>
 
+" Include my Qt MOC:  Add a #include for the matching Qt moc to the bottom of a cpp file (for unit tests, etc)
+map ,imm Go<CR>#include "<C-R>=expand("%:t:r")<CR>.moc"<CR><ESC>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Useful python header stuff
