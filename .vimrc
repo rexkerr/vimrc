@@ -122,6 +122,7 @@ if !filereadable(host_config_file)
    let host_config_lines=host_config_lines+[""]
    let host_config_lines=host_config_lines+["\" let g:projectRoot=\"<<project source root folder>>\""]
    let host_config_lines=host_config_lines+["\" let g:projectName=\"<<project name>>\""]
+   let host_config_lines=host_config_lines+["\" let g:companyName=\"<<company name>>\""]
 
    call writefile(host_config_lines, host_config_file)
 endif
@@ -160,6 +161,12 @@ set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
 set textwidth=0              " never wrap on paste
 set scrolloff=5              " Keep some lines above/below the cursor when scrolling
 set grepprg=rg\ --vimgrep    " Use ripgrep
+
+" Write grep/make output to a file for faster I/O
+if has("unix")
+set shellpipe=2>&1\|tee\ ~/.vim/shellpipe.txt\ %s\ >\ /dev/null
+endif
+
 inoremap jk <esc>
 inoremap kj <esc>
 
@@ -179,8 +186,8 @@ set visualbell
 augroup quixfix
     " automatically open cwindow after grep/make
     autocmd!
-    autocmd QuickFixCmdPost [^l]* cwindow
-    autocmd QuickFixCmdPost l*    lwindow
+    autocmd QuickFixCmdPost [^l]* cwindow 10
+    autocmd QuickFixCmdPost l*    lwindow 10
 augroup END
 
 augroup aft
@@ -453,6 +460,8 @@ map ,funix :set fileformat=unix<NL>
 " copy the full filename into the system clipboard
 map ,fname :let @+ = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
 
+map ,path :let @+ = fnamemodify(bufname("%"), ":p:h")<CR>:<BS>
+
 map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
 if(has("mac"))
@@ -682,21 +691,25 @@ map ,_nfcomment :normal ,_fcomment<NL>
 map ,_uncomment :let @z = @/<CR>:s/^\(\s*\)<C-R>=escape(comment_string, '/')<CR>/\1/e<NL>:let @/ = @z<CR>:<BS>
 map ,_nuncomment :normal ,_uncomment<NL>
 
-" TODO:  Move this to a company specific file...
-map ,cw <ESC>mzggO// Copyright (c) 2018, <COMPANY NAME>, All Rights Reserved<ESC>`z
+map ,cw <ESC>mzggO<c-r>=comment_string<CR> Copyright (c) <c-r>=strftime("%Y")<cr>, <c-r>=g:companyName<cr>, All Rights Reserved<ESC>`z
 
 " this will be overwritten by the .gvimrc if using gvim to change the colorscheme instead
 map ,light :let &background="light"<CR>
 map ,dark :let &background="dark"<CR>
 
-" for C++
-ab d_c< dynamic_cast<
-ab s_c< static_cast<
-ab r_c< reinterpret_cast<
-ab vectint std::vector<int>
-ab vectfloat std::vector<float>
-ab vectdouble std::vector<double>
-ab vectstring std::vector<std::string>
+" Abbrevations
+func! Eatchar(pat)
+    let c = nr2char(getchar(0))
+    return (c =~ a:pat) ? '' : c
+endfunc
+
+" Remember... <ctrl-v><space> to actually type these things w/o expansion
+iabbr <silent> vptr vtkSmartPointer<C-R>=Eatchar('\s')<CR>
+iabbr <silent> cdcast dynamic_cast<C-R>=Eatchar('\s')<CR>
+iabbr <silent> cscast static_cast<C-R>=Eatchar('\s')<CR>
+iabbr <silent> crcast reinterpret_cast<C-R>=Eatchar('\s')<CR>
+iabbr <silent> qdcast qSharedPointerDynamicCast<C-R>=Eatchar('\s')<CR>
+iabbr <silent> qscast qSharedPointerCast<C-R>=Eatchar('\s')<CR>
 
 map ,dos2unix mz:%s/<C-Q><C-M>$//g<NL>:noh<NL>`z
 "map ,tblfmt :perl -S tblfmt.pl "FS=," "OFS= | "
@@ -1270,6 +1283,48 @@ endfun
 map ,puf :call PutPrependedFunc()<CR>
 
 
+" -----------------------------------------------------------------------------
+"                                 git stuff
+" -----------------------------------------------------------------------------
+map ,gdt !git difftool -d %<CR>
+
+
+" -----------------------------------------------------------------------------
+" Create a TODO comment in the form of 
+"
+"      // TODO JIRA-1234 : 
+"
+" Assumes that the current folder is a git branch named after a Jira task.
+"
+" -----------------------------------------------------------------------------
+fun! TaskTodoFunc()
+   let taskid = GetJiraTaskID()
+   let comment = g:comment_string . ' TODO ' . taskid . ': '
+
+   put! =comment
+   exec "normal =="
+
+   startinsert!
+endfun
+
+" Create a todo with task ID
+map ,do :call TaskTodoFunc()<CR>
+
+fun! FindTaskTodos()
+   call ProjectRootCD()
+
+   let taskid = GetJiraTaskID()
+
+   exec ":grep \"".taskid."\""
+endfun
+
+map ,ft :call FindTaskTodos()<CR><CR>
+
+" -----------------------------------------------------------------------------
+"                       grep searches for current word
+" -----------------------------------------------------------------------------
+:nnoremap gr :call ProjectRootCD()<CR>:grep '\b<cword>\b'<CR><CR>
+:nnoremap sgr :call ProjectRootCD()<CR>:grep -g "*.h" -g "*.cpp" '\b<cword>\b'<CR><CR>
 
 " -----------------------------------------------------------------------------
 "                              equalprg formatters
@@ -1345,3 +1400,10 @@ fun! GenRTags()
     silent exec("!ctags -R --fields=+i -f ".folder."/tags ".folder."/*" )
     echo "Done generating tags in:  ".folder
 endfun
+
+fun! GetJiraTaskID()
+    let branch = substitute(system('git symbolic-ref -q HEAD'), 'refs/heads/', '', '')
+    let taskid = substitute(branch, '^\([A-Z]\+-[0-9]\+\)*.*', '\1', '')
+    return taskid
+endfun
+
