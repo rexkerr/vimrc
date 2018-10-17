@@ -48,7 +48,7 @@
 " M-F5: Change to project root (based on current file)
 "
 " F6: Swap header/source
-" S-F6: I forget, what's different?
+" S-F6: Swap header/source (h/cpp only)
 "
 " F7: Not used
 "
@@ -464,22 +464,19 @@ map ,path :let @+ = fnamemodify(bufname("%"), ":p:h")<CR>:<BS>
 
 map ,ym :let @* = matchstr(getline("."), @/)<CR>:<BS>
 
-if(has("mac"))
-   set dir=~/.vim/vimswap
-   set bdir=~/.vim/vimswap
-   set udir=~/.vim/vimswap
-  if !isdirectory(&dir)
-    execute("!mkdir " . &dir)
-  endif
-elseif has("unix")
-    set dir=~/.vim/vimswap//,/var/tmp//,/tmp//,.
-    set bdir=~/.vim/vimswap//,/var/tmp//,/tmp//,.
+if(has("mac") || has("unix"))
+    set dir=~/.vim/vimswap
+    set bdir=~/.vim/vimswap
+    set udir=~/.vim/vimswap
+    if(!isdirectory(&dir))
+        silent! execute("!mkdir -p " . &dir)
+    endif
 else
-  set dir=$TEMP\vimswap
-  set bdir=$TEMP\vimswap
-  if !isdirectory(&dir)
-    execute("!mkdir " . &dir)
-  endif
+    set dir=$TEMP\vimswap
+    set bdir=$TEMP\vimswap
+    if(!isdirectory(&dir))
+        silent! execute("!mkdir " . &dir)
+    endif
 endif
 
 
@@ -594,6 +591,9 @@ map ,tall <C-W>_
 map ,wide <C-W>\|
 map ,big ,tall,wide
 
+" make current window 5 taller or shorter
+map ,5 <C-W>5+
+map ,% <C-W>5-
 
 " Redo
 " map U <C-R>
@@ -834,6 +834,21 @@ function! GetHeaderOrSrcFile(force_h_cpp)
     let ext_end = match(extensions, ',', ext_begin)
     let ext     = strpart(extensions, ext_begin, ext_end - ext_begin)
     let result  = f_root . '.' . ext
+
+    if filereadable(result)
+      break
+    endif
+
+    " file wasn't readable, try replacing Inc w/ Src and Src w/ Inc
+    "  -- quick and dirty implementation...  I'm sure I could do something
+    "     cleaner if I wanted to think about it
+    let result = substitute(result, 'Inc', 'Src', '')
+
+    if filereadable(result)
+      break
+    endif
+
+    let result = substitute(result, 'Src', 'Inc', '')
 
     if filereadable(result)
       break
@@ -1288,6 +1303,17 @@ map ,puf :call PutPrependedFunc()<CR>
 " -----------------------------------------------------------------------------
 map ,gdt !git difftool -d %<CR>
 
+" copy the relative path and filename of the current file, relative to the gitroot
+
+map ,gname :call FilenameGitRelative()<CR>
+
+" -----------------------------------------------------------------------------
+"                                GDB helpers
+" -----------------------------------------------------------------------------
+" break here: puts command to add breakpoint command for the current file and line in the clipboard
+map ,bh :let @+ = 'b '.fnamemodify(bufname("%"), ":p:").':'.line('.')<CR>:<BS>
+map ,bf :let @+ = 'rb '.FindCurrentFunction(0)<CR>:echo @+<CR>
+
 
 " -----------------------------------------------------------------------------
 " Create a TODO comment in the form of 
@@ -1387,6 +1413,13 @@ fun! FindGitRoot()
     endwhile
 
     return gitfolder
+endfun
+
+fun! FilenameGitRelative()
+    let gitpath  = FindGitRoot()
+    let fullpath = fnamemodify(bufname("%"), ":p:")
+
+    let @+ = substitute(fullpath, gitpath."/", '', '')
 endfun
 
 fun! GenRTags()
