@@ -107,7 +107,7 @@ if !filereadable(host_config_file)
    let host_config_lines=host_config_lines+["let initialfontindex=2"]
    let host_config_lines=host_config_lines+[""]
    let host_config_lines=host_config_lines+["\"-------- other --------"]
-   let host_config_lines=host_config_lines+["let defaultprojectconfig=$HOME.\"/.vimprojects/default\""]
+   let host_config_lines=host_config_lines+["let defaultprojectconfig=$HOME.\"/.vim/projects/default\""]
    let host_config_lines=host_config_lines+[""]
    let host_config_lines=host_config_lines+["\"---------- plugins ---------"]
    let host_config_lines=host_config_lines+["set runtimepath^=~/.vim/bundle/Align"]
@@ -296,6 +296,8 @@ augroup qml
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cinkeys=0{,0},:,0#,!^F,o,O,e
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml let c_no_curly_error=1
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set foldcolumn=3
+  au BufWrite,BufNewFile,Bufread,BufEnter *.qml syntax match RKTEMP ".*RK\(ERR\)\=\s*TEMP.*"
+  au BufWrite,BufNewFile,Bufread,BufEnter *.qml highlight RKTEMP  ctermbg=darkmagenta ctermfg=white guibg=#6F1DF2 gui=bold guifg=#000000
 augroup END
 
 augroup vim_behavior
@@ -1380,10 +1382,14 @@ map <F12> ,unp
 " create a stub c++ program
 map ,main :set ft=cpp<CR>I#include <iostream><CR><CR>namespace<CR>{<CR>}<CR><CR>int main()<CR>{<CR>}<CR><ESC>2k
 
+" create a stub bash script
+map ,bscript :set ft=sh<CR>I#/usr/bin/env bash<CR><CR>Usage() {<CR>cat << USAGE<CR>Usage:  $(basename $0) [-h]<CR>  -h: This help<CR><C-U>USAGE<CR>}<CR><CR>while getopts "h" opt ; do<CR>case $opt in<CR>h) Usage; exit 0;;<CR>*) Fail "Unrecognized option";;<CR>esac<CR>done<CR>shift $((OPTIND - 1))<CR><CR><ESC>
+
+
 " -----------------------------------------------------------------------------
 
 fun! SelectProjectConfig()
-   let projectfiles=globpath($HOME."/.vimprojects/","*")
+   let projectfiles=globpath($HOME."/.vim/projects/","*")
    if(projectfiles=='')
       call confirm("No project files to load!", "ok", 1)
    else
