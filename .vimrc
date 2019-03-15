@@ -175,6 +175,9 @@ set nolisp
 
 set visualbell
 
+if has("nvim")
+    set bg=dark
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
@@ -206,16 +209,14 @@ augroup cprog
   au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set foldcolumn=3
   au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*(\|QMutexLocker\s*(\|\(unique_lock\|lock_guard\)\s*<.*>\s*("
   au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc highlight Dangerous_Stuff ctermbg=red guibg=#FF0000 gui=bold
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTEMP ".*RK\(ERR\)\=\s*TEMP.*"
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTEMP  ctermbg=darkmagenta ctermfg=white guibg=#6F1DF2 gui=bold guifg=#000000
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match RKTODO ".*RK\(ERR\)\=\s*TODO.*"
-  au BufWrite,BufNewFile,Bufread,BufEnter *.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight RKTODO  ctermbg=darkyellow ctermfg=white guibg=#444400 gui=bold guifg=#000000
+  au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc call RKHighlights()
 augroup END
 
 augroup cmake
   au!
   au BufWrite,BufNewFile,Bufread,BufEnter CMakeLists.txt,*.cmake let comment_string="#"
   au BufWrite,BufNewFile,Bufread,BufEnter CMakeLists.txt,*.cmake set comments=:#
+  au BufWrite,BufNewFile,Bufread,BufEnter CMakeLists.txt,*.cmake call RKHighlights()
 augroup END
 
 augroup Perl
@@ -228,7 +229,7 @@ augroup Perl
 augroup END
 
 augroup pyc
-    " Ooops... opened that stupid pyc file again in the file browser... no problem!
+    " Ooops... opened the pyc file in the Netrw browser, again... no problem!
     au! 
     au BufRead *.pyc exec ':edit ' . substitute(bufname("%"), "\.pyc", ".py", "")
 augroup END
@@ -296,8 +297,7 @@ augroup qml
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set cinkeys=0{,0},:,0#,!^F,o,O,e
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml let c_no_curly_error=1
   au BufWrite,BufNewFile,BufRead,BufEnter *.qml set foldcolumn=3
-  au BufWrite,BufNewFile,Bufread,BufEnter *.qml syntax match RKTEMP ".*RK\(ERR\)\=\s*TEMP.*"
-  au BufWrite,BufNewFile,Bufread,BufEnter *.qml highlight RKTEMP  ctermbg=darkmagenta ctermfg=white guibg=#6F1DF2 gui=bold guifg=#000000
+  au BufWrite,BufNewFile,Bufread,BufEnter *.qml call RKHighlights()
 augroup END
 
 augroup vim_behavior
@@ -330,6 +330,12 @@ fun! AutoResize()
    endif
 endfun
 
+fun! RKHighlights()
+    syntax match RKTEMP ".*RK\(ERR\)\=\s*TEMP.*"
+    highlight RKTEMP  ctermbg=darkmagenta ctermfg=white guibg=#6F1DF2 gui=bold guifg=#000000
+    syntax match RKTODO ".*RK\(ERR\)\=\s*TODO.*"
+    highlight RKTODO  ctermbg=darkyellow ctermfg=white guibg=#444400 gui=bold guifg=#000000
+endfun
 
 " Turn off syntax highlighting, etc. for large files
 let g:LargeFile= 10     " in megabytes
@@ -1320,14 +1326,14 @@ map ,bf :let @+ = 'rb '.FindCurrentFunction(0)<CR>:echo @+<CR>
 " -----------------------------------------------------------------------------
 " Create a TODO comment in the form of 
 "
-"      // TODO JIRA-1234 : 
+"      // RKERR TODO JIRA-1234 : 
 "
 " Assumes that the current folder is a git branch named after a Jira task.
 "
 " -----------------------------------------------------------------------------
 fun! TaskTodoFunc()
    let taskid = GetJiraTaskID()
-   let comment = g:comment_string . ' TODO ' . taskid . ': '
+   let comment = g:comment_string . 'RKERR TODO ' . taskid . ': '
 
    put! =comment
    exec "normal =="
@@ -1389,15 +1395,16 @@ map ,bscript :set ft=sh<CR>I#/usr/bin/env bash<CR><CR>Usage() {<CR>cat << USAGE<
 " -----------------------------------------------------------------------------
 
 fun! SelectProjectConfig()
-   let projectfiles=globpath($HOME."/.vim/projects/","*")
-   if(projectfiles=='')
+   let projectsPath = $HOME."/.vim/projects/"
+   let projects=substitute(globpath(projectsPath,"*"), projectsPath, "", "g")
+   if(projects=='')
       call confirm("No project files to load!", "ok", 1)
    else
-      let selectedproject=confirm("Which project would you like to load?", projectfiles, 1, "Question")
+      let selectedproject=confirm("Which project would you like to load?", projects, 1, "Question")
 
       if(selectedproject != 0)
-         let projects=split(projectfiles,"\n")
-         exec ":source ".projects[selectedproject - 1]
+         let projects=split(projects,"\n")
+         exec ":source ".projectsPath.projects[selectedproject - 1]
       else
          echo "Fine, be that way... I'll leave the project settings alone!"
       endif
