@@ -20,7 +20,7 @@ map <M-S-LEFT>  :set co-=5<CR>
 map <M-S-RIGHT> :set co+=5<CR>
 
 " Hide the menu since I seldom use it, and it gets in my way
-" set go-=m
+set go-=m
 " Hide the toolbar, since I never use it
 set go-=T
 " Make the tabline text rather than graphical

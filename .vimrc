@@ -40,12 +40,16 @@
 "
 " F3: Edit alternate file  (:e #)
 "
-" F4: Open filename under cursor in the other open window
-" S-F4: Open filename under the cursor in this window
+" F4: Open filename under the cursor in this window
+" S-F4: Open filename under cursor in a vertical split
+" M-F4: Open filename under cursor in a horizontal split
 "
 " F5: Change the current directory to that of the current file
-" S-F5: Unused
-" M-F5: Change to project root (based on current file)
+" M-F5: Change to the project root, always based on g:projectRoot
+" M-S-F5:  Change to one level ABOVE g:projectRoot
+" C-F5: Change to project root (based on current file)
+" C-S-F5: Change to one level ABOVE the project root 
+"    (git folder of current file, or g:projectRoot if git folder not found)
 "
 " F6: Swap header/source
 " S-F6: Swap header/source (h/cpp only)
@@ -144,7 +148,7 @@ filetype indent on           "
 set nocompatible             " Leave vi in the past
 set nobackup                 " Don't litter the filesystem with junk!
 set viminfo='20,\"50         " Remember up to 20 previous files, 50 lines per register
-set history=50               " keep 50 last commands
+set history=200              " keep 200 last commands
 set showtabline=2            " Always show the tabline, even if there is only one tab
 set ruler                    " Show the line & column number of the cursor position
 set number                   " Always show line numbers
@@ -161,10 +165,15 @@ set showbreak=\ \ >>>\       " Characters to show on edges of wrapped lines
 set textwidth=0              " never wrap on paste
 set scrolloff=5              " Keep some lines above/below the cursor when scrolling
 set grepprg=rg\ --vimgrep    " Use ripgrep
+set wildmenu                 " Show command line completions
 
 " Write grep/make output to a file for faster I/O
+fun! RedirectShellpipe()
+    set shellpipe=2>&1\|tee\ ~/.vim/shellpipe.txt\ %s\ >\ /dev/null
+endfun
+
 if has("unix")
-set shellpipe=2>&1\|tee\ ~/.vim/shellpipe.txt\ %s\ >\ /dev/null
+    call RedirectShellpipe()
 endif
 
 inoremap jk <esc>
@@ -195,6 +204,11 @@ augroup END
 
 augroup aft
   au BufWrite,BufNewFile,BufRead,BufEnter *.aft set noet
+augroup END
+
+" vim editing mode at the bash prompt
+augroup bash
+  au BufRead,BufEnter bash-fc-* set syntax=sh
 augroup END
 
 augroup cprog
@@ -495,14 +509,17 @@ set expandtab     " replace tabs with spaces
 set nowrapscan    " don't search past end of file
 set ignorecase
 set autoindent
-set backspace=2   "  =indent,eol,start
+set backspace=indent,eol,start
 set laststatus=2  " always show status line on last window
 set cmdheight=2   " number of lines for cmd wndow
 set cinoptions=g0 " scope declarations at column 0 of class
 
 map ,cd :call ConditionalCD()<CR>
 map <F5> ,cd
-map <M-F5> :call ProjectRootCD()<CR>
+map <M-F5> :call GProjectRootCD()<CR>
+map <M-S-F5> : call GProjectRootCD(1)<CR>
+map <C-F5> : call ProjectRootCD()<CR>
+map <C-S-F5> : call ProjectRootCD(1)<CR>
 map <F11> :cn<CR>
 map <s-f11> :cp<CR>
 map <m-F11> :cnf<CR>
@@ -518,7 +535,15 @@ fun! ConditionalCD()
   endif
 endfun
 
-fun! ProjectRootCD()
+fun! CdUpN(levels)
+    let l:levels = a:levels
+    while(l:levels > 0)
+        exec("cd ..")
+        let l:levels = l:levels - 1
+    endwhile
+endfun
+
+fun! ProjectRootCD(...)
     let folder = FindGitRoot()
     if(folder == "")
         if !exists("g:projectRoot")
@@ -530,7 +555,26 @@ fun! ProjectRootCD()
     endif
 
     exec("cd ".folder)
-    echo "Changed to project root folder:  ".folder
+
+    if(a:0)
+        call CdUpN(a:0)
+        echo "Changed to folder:  ".getcwd()
+    else
+        echo "Changed to project root folder:  ".folder
+    endif
+endfun
+
+fun! GProjectRootCD(...)
+    let folder=g:projectRoot
+
+    exec("cd ".folder)
+
+    if(a:0)
+        call CdUpN(a:0)
+        echo "Changed to folder:  ".getcwd()
+    else
+        echo "Changed to project root folder:  ".folder
+    endif
 endfun
 
 map ,explorer :call LaunchExplorerPWD()<CR>
@@ -636,7 +680,11 @@ map ,date o<ESC>"=strftime("%Y.%m.%d")<NL>p
 map ,dtime o<ESC>"=strftime("%Y.%m.%d %I:%M %p")<NL>p
 
 " Make the current file writable
-map ,hijack :! attrib -r <C-R>%<NL>
+if has("unix")
+    map ,hijack :!chmod +w "<C-R>%"<NL>
+else
+    map ,hijack :!attrib -r <C-R>%<NL>
+endif
 
 
 " replace the character with a carriage return
@@ -917,88 +965,52 @@ function! RulerStr()
 endfunction
 
 
-nn ,getfileotherwin :call GetFileInOtherWindow()<NL>
-map <F4> ,getfileotherwin
+map <F4> :call GetFileInThisWindow()<CR>
+map <S-F4> :call GetFileInVSplit()<CR>
+map <M-F4> :call GetFileInHSplit()<CR>
 
-
-nn ,getfilethiswin :call GetFileInThisWindow()<NL>
-map <S-F4> ,getfilethiswin
-
-
-fun! GetFileInOtherWindow()
-  call AddPath()
-  "exe'norm'.nr2char(23).'f'
-  let fname = expand('<cfile>')
-  let v:errmsg = ""
-  if NumWindows()>1
-    exe'norm'.nr2char(23).'W'
-    exe'find ' . fname
-  else
-    exe'sfind ' . fname
-  endif
-  if v:errmsg != ""
-    exe'norm'.nr2char(12)
-    exe'norm'.nr2char(23).'w'
-    call confirm("File '" . fname . "' could not be found.\nAre you sure you're in the right directory?", "ok", 1 )
-  endif
-  call RestorePath()
+fun! GetFileLocation()
+    let fname = expand('<cfile>')
+    if(fname != '' && fname[0] =~ "[A-Za-z0-9]")
+        silent let path = system('find `pwd` -name '.fname.' | head -1')
+        return path
+    else
+        echo "No file under cursor"
+        return ""
+    endif
 endfun
-
 
 fun! GetFileInThisWindow()
-  "call AddPath()
-  let v:errmsg = ""
-  let fname = expand('<cfile>')
-  silent! execute('find ' . fname)
-  if v:errmsg != ""
-    call confirm("File '" . fname . "' could not be found.\nAre you sure you're in the right directory?", "ok", 1 )
-  endif
-  "call RestorePath()
-endfun
+    let fname = GetFileLocation()
 
-
-fun! AddPath()
-  if g:pathShouldBeCorrected
-    call RestorePath()
-  endif
-  let g:pathShouldBeCorrected = 1
-
-  let g:oldPath = &path
-  let pathadd = fnamemodify(bufname('%'), ':p')
-
-
-  let pathadd1 = substitute(pathadd, 'src', 'include', '')
-  let pathadd2 = substitute(pathadd, 'include', 'src', '')
-  let pathToAdd = ""
-
-
-  if pathadd == pathadd1 && pathadd == pathadd2
-    return
-  endif
-
-
-  if isdirectory(pathadd1)
-    let &path = &path . ',' . pathadd1
-  endif
-  if pathadd1 != pathadd2
-    if isdirectory(pathadd2)
-      let &path = &path . ',' . pathadd1
+    if(fname != '')
+        exec("edit ".fname)
+    else
+        echo "Could not find the file:  ".expand('<cfile>')
     endif
-  endif
 endfun
 
+fun! GetFileInVSplit()
+    let fname = GetFileLocation()
 
-fun! RestorePath()
-  if g:pathShouldBeCorrected != 0
-    let g:pathShouldBeCorrected = 0
-    let &path = g:oldPath
-  endif
+    if(fname != '')
+        vnew
+        exec("edit ".fname)
+    else
+        echo "Could not find the file:  ".expand('<cfile>')
+    endif
 endfun
 
+fun! GetFileInHSplit()
+    let fname = GetFileLocation()
 
-let oldPath = &path
-let pathShouldBeCorrected = 0
-
+    if(fname != '')
+        new
+        exec("edit ".fname)
+    else
+        echo "Could not find the file:  ".expand('<cfile>')
+    endif
+endfun
 
 fun! NumWindows()
   let i=1
@@ -1309,7 +1321,10 @@ map ,puf :call PutPrependedFunc()<CR>
 " -----------------------------------------------------------------------------
 "                                 git stuff
 " -----------------------------------------------------------------------------
-map ,gdt !git difftool -d %<CR>
+map ,gdt :update<CR>!git difftool -d %<CR>
+map ,gdiff :update<CR>!git --no-pager diff %<CR>
+map ,gblame :update<CR>!git --no-pager blame %<CR>
+map ,glog :update<CR>!git --no-pager log %<CR>
 
 " copy the relative path and filename of the current file, relative to the gitroot
 
@@ -1333,7 +1348,7 @@ map ,bf :let @+ = 'rb '.FindCurrentFunction(0)<CR>:echo @+<CR>
 " -----------------------------------------------------------------------------
 fun! TaskTodoFunc()
    let taskid = GetJiraTaskID()
-   let comment = g:comment_string . 'RKERR TODO ' . taskid . ': '
+   let comment = g:comment_string . ' RKERR TODO ' . taskid . ': '
 
    put! =comment
    exec "normal =="
@@ -1452,4 +1467,27 @@ fun! GetJiraTaskID()
     let taskid = substitute(branch, '^\([A-Z]\+-[0-9]\+\)*.*', '\1', '')
     return taskid
 endfun
+
+" Echo the current git branchname
+map ,bn :echo substitute(system('git symbolic-ref -q HEAD'), 'refs/heads/', '', '')<CR>
+
+fun! CompileSingleFile()
+    echo "Compiling ".expand("%")
+    silent update
+    cexpr system("compile_file ".g:buildFolder." ".expand("%:p"))
+    botright cwindow
+
+    if(v:shell_error == 0)
+        echo "Success!"
+    else
+        botright copen
+    endif
+endfun
+
+map <silent> ,mkf :call CompileSingleFile()<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+" netrw stuff
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+" let g:netrw_liststyle= 3   " i to cycle through styles
 
