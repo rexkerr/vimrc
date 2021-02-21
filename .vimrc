@@ -1117,8 +1117,8 @@ vmap ,ubbu "zxi[url="<C-V>"][/url]<ESC>5h"zP
 map ,err :let @z = tempname()<CR>:w! <C-R>z<CR>:cf %<CR>
 map ,[I [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 
-unmap <C-A>
-unmap <C-X>
+silent! unmap <C-A>
+silent! unmap <C-X>
 
 "set errorformat=%f(%l):\.\*
 "source $VIM\tagmenu.vim
