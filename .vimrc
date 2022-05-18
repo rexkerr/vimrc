@@ -213,17 +213,17 @@ augroup END
 
 augroup cprog
   au!
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set list
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set nolisp
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set filetype=cpp syntax=cpp.doxygen
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set formatoptions=crql cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
-  au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let comment_string = "//"
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set cinkeys=0{,0},:,0#,!^F,o,O,e
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc let c_no_curly_error=1
-  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc set foldcolumn=3
-  au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc syntax match dangerous_stuff "scoped_lock\s*(\|QMutexLocker\s*(\|\(unique_lock\|lock_guard\)\s*<.*>\s*("
-  au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc highlight Dangerous_Stuff ctermbg=red guibg=#FF0000 gui=bold
-  au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cpp,*.ipp,*.icc call RKHighlights()
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc set list
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc set nolisp
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc set filetype=cpp syntax=cpp.doxygen
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc set formatoptions=crql cindent comments=sr:/*,mb:*,el:*/,:///,:// isk-=$
+  au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc let comment_string = "//"
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc set cinkeys=0{,0},:,0#,!^F,o,O,e
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc let c_no_curly_error=1
+  au BufWrite,BufNewFile,BufRead,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc set foldcolumn=3
+  au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc syntax match dangerous_stuff "\s*\(std\::\)\?\(lock_guard\|scoped_lock\|QMutexLocker\)\(\s*<.*>\)\?\s*[({].*"
+  au bufwrite,bufnewfile,bufread,bufenter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc highlight Dangerous_Stuff ctermbg=red guibg=#FF0000 gui=bold
+  au BufWrite,BufNewFile,Bufread,BufEnter *.hpp,*.h,*.c,*.cc,*.cpp,*.ipp,*.icc call RKHighlights()
 augroup END
 
 augroup cmake
@@ -259,6 +259,7 @@ augroup Python
   au BufWrite,BufNewFile,Bufread,BufEnter *.py set formatoptions=crq2
   au BufWrite,BufNewFile,Bufread,BufEnter *.py let comment_string = "#"
   au BufWrite,BufNewFile,Bufread,BufEnter,FileType python setlocal equalprg=autopep8\ -
+  au BufWrite,BufNewFile,Bufread,BufEnter *.py call RKHighlights()
 augroup END
 
 augroup json
@@ -390,18 +391,18 @@ endfun
 
 fun! UpdateWSHighlights()
    if g:HighlightStrayWhitespace > 0
-      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
-      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
-      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#454545 gui=bold
-      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#353030 gui=bold
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cc,*.cpp,*.pl,*.ipp,*.icc syntax match straytabs "\t"
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cc,*.cpp,*.pl,*.ipp,*.icc syntax match strayspaces "\s\+$"
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cc,*.cpp,*.pl,*.ipp,*.icc highlight StrayTabs guibg=#454545 gui=bold
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cc,*.cpp,*.pl,*.ipp,*.icc highlight StraySpaces guibg=#353030 gui=bold
 
       syntax match straytabs "\t"
       syntax match strayspaces "\s\+$"
       highlight StrayTabs guibg=#454545 gui=bold
       highlight StraySpaces guibg=#353030 gui=bold
    else
-      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax clear straytabs
-      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cpp,*.pl,*.ipp,*.icc syntax clear strayspaces
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cc,*.cpp,*.pl,*.ipp,*.icc syntax clear straytabs
+      au bufwrite,bufnewfile,bufread,bufenter *.py,*.h,*.c,*.cc,*.cpp,*.pl,*.ipp,*.icc syntax clear strayspaces
 
       syntax clear straytabs
       syntax clear strayspaces
@@ -453,7 +454,7 @@ fu! Options()
   let opt=opt." ".&ft
 
   if &ft==?"cpp" || &ft==?"perl"
-    let text=" {f:" . FindCurrentFunction(0) . "}"
+    let text=" {f:" . FindCurrentFunction(0) . FindCurrentVisibility() "}"
     let opt=opt.text
   endif
 
@@ -481,6 +482,7 @@ map ,funix :set fileformat=unix<NL>
 
 " copy the full filename into the system clipboard
 map ,fname :let @+ = fnamemodify(bufname("%"), ":p:")<CR>:<BS>
+map ,share  :call FilenameGitRelative(1)<CR>
 
 map ,path :let @+ = fnamemodify(bufname("%"), ":p:h")<CR>:<BS>
 
@@ -1187,6 +1189,40 @@ fu! FindCurrentFunction(or_prev)
   return text
 endf
 
+function! FindCurrentVisibility()
+  let f_ext    = fnamemodify(bufname('%'), ':e')
+  if(f_ext != "h")
+      return ""
+  endif
+
+  let text =''
+
+  let curcol  = col('.')
+  let curline = line('.')
+
+  let oldmagic = &magic
+  let &magic = 1
+
+  call cursor(curline+1, curcol)
+
+  let searchstring = '^\s*\(public\s*:\|private\s*:\|protected\s*:\|signals\s*:\)'
+
+  let l = search(searchstring, 'bW')
+
+  if l != 0
+      let line_text = getline(l)
+      let matched_text = matchstr(line_text, searchstring)
+      let matched_text = substitute(matched_text, '\s\|:', '', 'g')
+      let text = matched_text
+  endif
+
+  call cursor(curline, curcol)
+
+  let &magic = oldmagic
+
+  return "[" . text . "]"
+endfunction
+
 " Function to put curly braces around a selection
 if(has("mac"))
    vmap <D-[> :call WrapCurlyBracketsVisual()<CR>mz[{=%`z
@@ -1202,7 +1238,8 @@ function! WrapCurlyBracketsVisual() range
 endfun
 
 " tags configuration
-set tags=./tags;
+"set tags=./tags;
+set tags=./tags;,~/Downloads/dcmtk3.6.6/dcmtk-3.6.6/tags,~/gitroot/thirdparty_tags
 
 if has("unix")
   :nmap ,t :!(cd %:p:h;ctags *.[ch])&
@@ -1319,6 +1356,59 @@ map ,puf :call PutPrependedFunc()<CR>
 
 
 " -----------------------------------------------------------------------------
+"   Convert lambda to function
+" -----------------------------------------------------------------------------
+fun! LambdaToFunction()
+    let oldmagic = &magic
+    let &magic = 1
+
+    " move to the end of the current line in case we're on the line w/ the lambda
+    call cursor(line('.'), col('$'))
+
+    " search for a lamda definition
+    let linenum = search('^\s*auto.*=\s*\[', "bW")
+
+    if(linenum == 0)
+        echoerr "Lambda Not Found"
+        let &magic = oldmagic
+        return
+    endif
+
+    " if the line ends with a {, move it to the next line
+    let original_line = getline(linenum)
+    let new_line = substitute(getline(linenum), '\s*{\s*$', '', '')
+
+    if(original_line != new_line)
+        call setline(linenum, new_line)
+        call append(linenum, "{")
+    endif
+
+    " Remove the captures -- too bad if they need to be replaced!
+    let new_line = substitute(new_line, '\s*=\s*\[.\{-}\]', '', '')
+    call setline(linenum, new_line)
+ 
+    " Remove the trailing semicolon
+    call cursor(linenum+1, 1)
+    let [pair_line, pair_col]  = searchpairpos('{', '', '}', 'n')
+
+    if(pair_line > 0)
+        call setline(pair_line, substitute(getline(pair_line), '};\s*$', '}', ''))
+    endif
+
+    " Put the cursor back to fix the return type
+    call cursor(linenum, 1)
+
+    let &magic = oldmagic
+endfun
+
+map ,ltf :call LambdaToFunction()<CR>
+
+" -----------------------------------------------------------------------------
+"                                 build stuff
+" -----------------------------------------------------------------------------
+map ,mi :make install<CR>
+
+" -----------------------------------------------------------------------------
 "                                 git stuff
 " -----------------------------------------------------------------------------
 map ,gdt :update<CR>!git difftool -d %<CR>
@@ -1328,7 +1418,7 @@ map ,glog :update<CR>!git --no-pager log %<CR>
 
 " copy the relative path and filename of the current file, relative to the gitroot
 
-map ,gname :call FilenameGitRelative()<CR>
+map ,gname :call FilenameGitRelative(0)<CR>
 
 " -----------------------------------------------------------------------------
 "                                GDB helpers
@@ -1348,7 +1438,7 @@ map ,bf :let @+ = 'rb '.FindCurrentFunction(0)<CR>:echo @+<CR>
 " -----------------------------------------------------------------------------
 fun! TaskTodoFunc()
    let taskid = GetJiraTaskID()
-   let comment = g:comment_string . ' RKERR TODO ' . taskid . ': '
+   let comment = g:comment_string . ' [DO NOT MERGE] RKERR TODO ' . taskid . ': '
 
    put! =comment
    exec "normal =="
@@ -1443,11 +1533,15 @@ fun! FindGitRoot()
     return gitfolder
 endfun
 
-fun! FilenameGitRelative()
+fun! FilenameGitRelative(withLineNum)
     let gitpath  = FindGitRoot()
     let fullpath = fnamemodify(bufname("%"), ":p:")
 
     let @+ = substitute(fullpath, gitpath."/", '', '')
+
+    if(a:withLineNum == 1)
+       let @+ .= ", line " . line('.')
+    endif
 endfun
 
 fun! GenRTags()
@@ -1474,7 +1568,7 @@ map ,bn :echo substitute(system('git symbolic-ref -q HEAD'), 'refs/heads/', '', 
 fun! CompileSingleFile()
     echo "Compiling ".expand("%")
     silent update
-    cexpr system("compile_file ".g:buildFolder." ".expand("%:p"))
+    cexpr system("compile_file \"".g:buildFolder."\" \"".expand("%:p")."\"")
     botright cwindow
 
     if(v:shell_error == 0)
