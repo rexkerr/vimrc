@@ -169,7 +169,11 @@ set wildmenu                 " Show command line completions
 
 " Write grep/make output to a file for faster I/O
 fun! RedirectShellpipe()
-    set shellpipe=2>&1\|tee\ ~/.vim/shellpipe.txt\ %s\ >\ /dev/null
+    " VIM 9:  There's a change from vim 8 to vim 9 -- vim 8 used to add a
+    "         space between makeprg/grepprg/etc and the shellpipe command....
+    "         but not anymore, so I had to add an explicit space at the
+    "         start....
+    set shellpipe=\ 2>&1\|tee\ ~/.vim/shellpipe.txt\ %s\ >\ /dev/null
 endfun
 
 if has("unix")
@@ -413,8 +417,17 @@ call UpdateWSHighlights()
 
 
 " Make the statusline red for read-only files and blue for read-write files -- also makes the filename on the tab red
-au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guifg=Red guibg=black ctermbg=black ctermfg=red | :else | hi StatusLine guibg=White guifg=blue ctermbg=white ctermfg=blue | endif 
-au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=Red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
+" 
+" Interestingly, old versions of vim seemed to have the guifg and guibg colors
+" backwards and I either never noticed, or just hacked at it until these
+" worked, but with vim 9.0 my colors were all wrong!
+if(v:version < 900)
+    au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guifg=red guibg=black ctermbg=black ctermfg=red | :else | hi StatusLine guibg=white guifg=blue ctermbg=white ctermfg=blue | endif 
+    au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
+else
+    au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guibg=red guifg=black ctermbg=black ctermfg=red | :else | hi StatusLine guifg=white guibg=blue ctermbg=white ctermfg=blue | endif 
+    au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
+endif
 
 map ,python :!python %<CR>
 
@@ -1462,8 +1475,8 @@ map ,ft :call FindTaskTodos()<CR><CR>
 " -----------------------------------------------------------------------------
 "                       grep searches for current word
 " -----------------------------------------------------------------------------
-:nnoremap gr :call ProjectRootCD()<CR>:grep '\b<cword>\b'<CR><CR>
-:nnoremap sgr :call ProjectRootCD()<CR>:grep -g "*.h" -g "*.cpp" '\b<cword>\b'<CR><CR>
+:nnoremap gr :call ProjectRootCD()<CR>:grep '\b<cword>\b' <CR><CR>
+:nnoremap sgr :call ProjectRootCD()<CR>:grep -g "*.h" -g "*.cpp" '\b<cword>\b' <CR><CR>
 
 " -----------------------------------------------------------------------------
 "                              equalprg formatters

@@ -1,8 +1,13 @@
 if(v:version >= 700)
    set guitablabel=%N\ %t\ %m
 endif
+"
+" I almost always use a black background...
+set background=dark          
 
+" My preferred colors
 colorscheme torte
+
 " Set a reasonable color scheme for the UGLY autocompletion popup
 highlight Pmenu guibg=brown gui=bold 
 
@@ -21,17 +26,14 @@ map <M-S-RIGHT> :set co+=5<CR>
 
 " Hide the menu since I seldom use it, and it gets in my way
 set go-=m
+
 " Hide the toolbar, since I never use it
 set go-=T
+
 " Make the tabline text rather than graphical
 set go-=e
 
-" Remove the help menu since I never use it and its accelerator 
-" interferes w/ alt-h, which I use for navigating splits (see .vimrc)
-aunmenu Help
-
-set background=dark          " I almost always use a black background...
-
+" quickly change colors
 map ,dark :colorscheme torte<cr>:set bg=dark<cr>
 map ,light :colorscheme peachpuff<cr>:set bg=light<cr>
 
