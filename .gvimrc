@@ -33,9 +33,4 @@ set go-=T
 " Make the tabline text rather than graphical
 set go-=e
 
-" quickly change colors
-map ,dark :colorscheme torte<cr>:set bg=dark<cr>
-map ,light :colorscheme peachpuff<cr>:set bg=light<cr>
-
-
 " vim: nowrap

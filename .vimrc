@@ -420,12 +420,13 @@ call UpdateWSHighlights()
 " 
 " Interestingly, old versions of vim seemed to have the guifg and guibg colors
 " backwards and I either never noticed, or just hacked at it until these
-" worked, but with vim 9.0 my colors were all wrong!
+" worked, but with vim 9.0 my colors were all wrong!  Interestingly, the
+" ctermfg and ctermbg colors still seem to be backwards!
 if(v:version < 900)
     au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guifg=red guibg=black ctermbg=black ctermfg=red | :else | hi StatusLine guibg=white guifg=blue ctermbg=white ctermfg=blue | endif 
     au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
 else
-    au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guibg=red guifg=black ctermbg=black ctermfg=red | :else | hi StatusLine guifg=white guibg=blue ctermbg=white ctermfg=blue | endif 
+    au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi StatusLine guibg=red guifg=black ctermbg=black ctermfg=red | :else | hi StatusLine guifg=white guibg=blue ctermbg=white ctermfg=20 | endif 
     au BufNew,BufAdd,BufWrite,BufNewFile,BufRead,BufEnter,FileChangedRO * :if &ro | hi TabLineSel guifg=red ctermfg=red | :else | hi TabLineSel guifg=gray ctermfg=gray | endif 
 endif
 
@@ -764,9 +765,8 @@ map ,_nuncomment :normal ,_uncomment<NL>
 
 map ,cw <ESC>mzggO<c-r>=comment_string<CR> Copyright (c) <c-r>=strftime("%Y")<cr>, <c-r>=g:companyName<cr>, All Rights Reserved<ESC>`z
 
-" this will be overwritten by the .gvimrc if using gvim to change the colorscheme instead
-map ,light :let &background="light"<CR>
-map ,dark :let &background="dark"<CR>
+map ,dark :colorscheme torte<cr>:set bg=dark<cr>
+map ,light :colorscheme peachpuff<cr>:set bg=light<cr>
 
 " Abbrevations
 func! Eatchar(pat)
